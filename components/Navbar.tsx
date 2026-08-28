@@ -3,24 +3,31 @@
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 
-export default function Navbar() {
+interface NavbarProps {
+  onSearch?: (query: string) => void;
+  searchQuery?: string;
+}
+
+export default function Navbar({ onSearch, searchQuery = '' }: NavbarProps) {
   const { totalItems, wishlist } = useCart();
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         
-        {/* Logo NovaCart */}
+        {/* Logo VeloceStore */}
         <Link href="/" className="text-xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
           <span className="bg-blue-600 text-white px-2.5 py-1 rounded-lg">V</span>
           <span>VeloceStore</span>
         </Link>
 
-        {/* Search Bar */}
+        {/* Dynamic Search Bar */}
         <div className="flex-1 max-w-md hidden md:block">
           <div className="relative">
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => onSearch && onSearch(e.target.value)}
               placeholder="Search products, categories..."
               className="w-full pl-4 pr-10 py-2 rounded-full bg-gray-100 border-none text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400"
             />
