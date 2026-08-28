@@ -21,24 +21,36 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // 1. Charger les données au premier démarrage de la page
+  // 1. Lire depuis localStorage une seule fois au montage
   useEffect(() => {
-    const savedCart = localStorage.getItem('veloce_cart');
-    const savedWishlist = localStorage.getItem('veloce_wishlist');
-    if (savedCart) setCart(JSON.parse(savedCart));
-    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+    try {
+      const savedCart = localStorage.getItem('veloce_cart');
+      const savedWishlist = localStorage.getItem('veloce_wishlist');
+
+      if (savedCart) setCart(JSON.parse(savedCart));
+      if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+    } catch (error) {
+      console.error('Failed to load storage:', error);
+    } finally {
+      setIsInitialized(true); // Autorise les sauvegardes futures
+    }
   }, []);
 
-  // 2. Sauvegarder dans localStorage dès que le panier change
+  // 2. Sauvegarder le panier UNIQUEMENT après la lecture initiale
   useEffect(() => {
-    localStorage.setItem('veloce_cart', JSON.stringify(cart));
-  }, [cart]);
+    if (isInitialized) {
+      localStorage.setItem('veloce_cart', JSON.stringify(cart));
+    }
+  }, [cart, isInitialized]);
 
-  // 3. Sauvegarder dans localStorage dès que la wishlist change
+  // 3. Sauvegarder la wishlist UNIQUEMENT après la lecture initiale
   useEffect(() => {
-    localStorage.setItem('veloce_wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
+    if (isInitialized) {
+      localStorage.setItem('veloce_wishlist', JSON.stringify(wishlist));
+    }
+  }, [wishlist, isInitialized]);
 
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
