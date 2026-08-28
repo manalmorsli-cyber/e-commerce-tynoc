@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 
@@ -29,8 +30,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       </button>
 
       <div>
-        {/* Product Image */}
-        <div className="relative aspect-square w-full bg-gray-50 overflow-hidden">
+        {/* Product Image & Link */}
+        <Link href={`/product/${product.id}`} className="block relative aspect-square w-full bg-gray-50 overflow-hidden">
           <img
             src={product.imageUrl}
             alt={product.title}
@@ -39,14 +40,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-xs font-semibold text-gray-700">
             {product.category}
           </span>
-        </div>
+        </Link>
 
         {/* Product Details */}
         <div className="p-5">
           <div className="flex items-center justify-between gap-2 mb-2">
-            <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
+            <Link href={`/product/${product.id}`} className="font-semibold text-gray-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
               {product.title}
-            </h3>
+            </Link>
             <div className="flex items-center gap-1 text-xs font-medium text-amber-500">
               ★ <span>{product.rating}</span>
             </div>
