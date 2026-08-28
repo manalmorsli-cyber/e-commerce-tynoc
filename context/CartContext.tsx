@@ -9,6 +9,7 @@ interface CartContextType {
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
   toggleWishlist: (product: Product) => void;
   isInWishlist: (productId: string) => boolean;
   totalItems: number;
@@ -21,7 +22,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
 
-  // Ajouter un produit au panier
+  // 1. Charger les données au premier démarrage de la page
+  useEffect(() => {
+    const savedCart = localStorage.getItem('veloce_cart');
+    const savedWishlist = localStorage.getItem('veloce_wishlist');
+    if (savedCart) setCart(JSON.parse(savedCart));
+    if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+  }, []);
+
+  // 2. Sauvegarder dans localStorage dès que le panier change
+  useEffect(() => {
+    localStorage.setItem('veloce_cart', JSON.stringify(cart));
+  }, [cart]);
+
+  // 3. Sauvegarder dans localStorage dès que la wishlist change
+  useEffect(() => {
+    localStorage.setItem('veloce_wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
+
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.product.id === product.id);
@@ -36,12 +54,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Supprimer un produit du panier
   const removeFromCart = (productId: string) => {
     setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
   };
 
-  // Ajuster la quantité
   const updateQuantity = (productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId);
@@ -54,7 +70,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  // Basculer un produit dans la Wishlist
+  const clearCart = () => {
+    setCart([]);
+  };
+
   const toggleWishlist = (product: Product) => {
     setWishlist((prevWishlist) => {
       const exists = prevWishlist.some((p) => p.id === product.id);
@@ -69,7 +88,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return wishlist.some((p) => p.id === productId);
   };
 
-  // Calculs dynamiques
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
@@ -81,6 +99,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addToCart,
         removeFromCart,
         updateQuantity,
+        clearCart,
         toggleWishlist,
         isInWishlist,
         totalItems,

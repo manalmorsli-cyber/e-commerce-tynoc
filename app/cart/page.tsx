@@ -135,11 +135,12 @@ export default function CartPage() {
                 <span className="text-2xl text-blue-600">${total.toFixed(2)}</span>
               </div>
 
-              <button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition-colors active:scale-95 shadow-md"
-              >
+              <Link
+                href="/checkout"
+                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold py-3.5 rounded-xl transition-colors active:scale-95 shadow-md"
+                >
                 Proceed to Checkout
-              </button>
+                </Link>
 
               {subtotal > 0 && subtotal < 100 && (
                 <p className="text-xs text-center text-gray-500">
