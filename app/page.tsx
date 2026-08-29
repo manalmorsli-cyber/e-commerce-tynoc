@@ -42,7 +42,8 @@ const initialProducts = [
     description: 'Premium vegan leather desk pad, waterproof surface, and anti-slip rubber base.',
     price: 35,
     category: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1616410011236-7a42121dd981?w=500&q=80',
+    badge: 'NEW',
+    image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&q=80',
     rating: 4.9,
   },
 ];
@@ -61,6 +62,8 @@ export default function HomePage() {
     return matchesSearch && matchesCategory;
   });
 
+  const isFiltering = searchQuery.trim() !== '' || selectedCategory !== 'All';
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar
@@ -71,12 +74,12 @@ export default function HomePage() {
         showSearch={true}
       />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Banner Carousel */}
-        <HeroCarousel />
+      {/* 1. HERO BANNER EN HAUT */}
+      {!isFiltering && <HeroCarousel />}
 
-        {/* Trust & Speed Value Badges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {/* 2. REASSURANCE BADGES */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
             <span className="text-2xl">⚡</span>
             <div>
@@ -110,18 +113,25 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Dynamic Product Carousel Slider with < > Controls */}
-        <ProductCarousel products={initialProducts} title="🔥 Trending Fast Deals" />
+        {/* 3. TRENDING CAROUSEL */}
+        {!isFiltering && (
+          <ProductCarousel products={initialProducts} title="🔥 Trending Fast Deals" />
+        )}
 
-        {/* Category Pills & All Products Grid Section */}
-        <div id="products" className="scroll-mt-24 pt-4 mb-8">
+        {/* 4. CATALOGUE GENERAL */}
+        <div id="products" className="scroll-mt-24 pt-4 mb-12">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900">Explore Catalog</h2>
-              <p className="text-xs text-slate-500">Filter by category or search term</p>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                {isFiltering ? 'Search Results' : 'Explore Catalog'}
+              </h2>
+              <p className="text-xs text-slate-500">
+                {isFiltering
+                  ? `Showing products matching your criteria (${filteredProducts.length})`
+                  : 'Filter by category or browse all items'}
+              </p>
             </div>
 
-            {/* Category Filter Pills */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
               {categories.map((cat) => (
                 <button
@@ -139,22 +149,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Product Grid */}
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm max-w-md mx-auto">
-              <span className="text-3xl block mb-2">🔍</span>
-              <h3 className="text-sm font-bold text-slate-900">No products found</h3>
-              <p className="text-slate-500 text-xs mt-1">
-                Try searching for another term or selecting a different category.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         </div>
       </main>
     </div>
