@@ -1,5 +1,5 @@
 'use client';
-
+import Footer from '@/components/Footer';
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import HeroCarousel from '@/components/HeroCarousel';
@@ -98,96 +98,100 @@ export default function HomePage() {
   const isFiltering = searchQuery.trim() !== '' || selectedCategory !== 'All';
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <Navbar
-        searchQuery={searchQuery}
-        onSearch={setSearchQuery}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        showSearch={true}
-      />
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
+      <div>
+        <Navbar
+          searchQuery={searchQuery}
+          onSearch={setSearchQuery}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          showSearch={true}
+        />
 
-      {!isFiltering && <HeroCarousel />}
+        {!isFiltering && <HeroCarousel />}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        {/* Badges Reassurance */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
-            <span className="text-xl">⚡</span>
-            <div>
-              <h4 className="font-bold text-slate-900 text-xs">Fast Shipping</h4>
-              <p className="text-[10px] text-slate-500">Same-day dispatch</p>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          {/* Badges Reassurance (Responsive Grid) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
+              <span className="text-xl">⚡</span>
+              <div>
+                <h4 className="font-bold text-slate-900 text-xs">Fast Shipping</h4>
+                <p className="text-[10px] text-slate-500">Same-day dispatch</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
+              <span className="text-xl">🛡️</span>
+              <div>
+                <h4 className="font-bold text-slate-900 text-xs">Secure Payment</h4>
+                <p className="text-[10px] text-slate-500">100% encrypted</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
+              <span className="text-xl">🔄</span>
+              <div>
+                <h4 className="font-bold text-slate-900 text-xs">30 Days Return</h4>
+                <p className="text-[10px] text-slate-500">Money back guarantee</p>
+              </div>
+            </div>
+
+            <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
+              <span className="text-xl">💬</span>
+              <div>
+                <h4 className="font-bold text-slate-900 text-xs">24/7 Support</h4>
+                <p className="text-[10px] text-slate-500">Dedicated assistance</p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
-            <span className="text-xl">🛡️</span>
-            <div>
-              <h4 className="font-bold text-slate-900 text-xs">Secure Payment</h4>
-              <p className="text-[10px] text-slate-500">100% encrypted</p>
-            </div>
-          </div>
+          {/* Carrousel Ventes Flash */}
+          {!isFiltering && (
+            <ProductCarousel products={flashSaleProducts} title="🔥 Limited Time Flash Deals" />
+          )}
 
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
-            <span className="text-xl">🔄</span>
-            <div>
-              <h4 className="font-bold text-slate-900 text-xs">30 Days Return</h4>
-              <p className="text-[10px] text-slate-500">Money back guarantee</p>
-            </div>
-          </div>
+          {/* Catalogue */}
+          <div id="products" className="scroll-mt-24 pt-2 mb-12">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-lg sm:text-2xl font-black text-slate-900">
+                  {isFiltering ? 'Search Results' : 'Explore Full Catalog'}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  {isFiltering
+                    ? `Showing products matching your criteria (${filteredProducts.length})`
+                    : 'Filter by category or browse all items'}
+                </p>
+              </div>
 
-          <div className="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center gap-3">
-            <span className="text-xl">💬</span>
-            <div>
-              <h4 className="font-bold text-slate-900 text-xs">24/7 Support</h4>
-              <p className="text-[10px] text-slate-500">Dedicated assistance</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Carrousel Ventes Flash */}
-        {!isFiltering && (
-          <ProductCarousel products={flashSaleProducts} title="🔥 Limited Time Flash Deals" />
-        )}
-
-        {/* Catalogue */}
-        <div id="products" className="scroll-mt-24 pt-2 mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-lg sm:text-2xl font-black text-slate-900">
-                {isFiltering ? 'Search Results' : 'Explore Full Catalog'}
-              </h2>
-              <p className="text-xs text-slate-500">
-                {isFiltering
-                  ? `Showing products matching your criteria (${filteredProducts.length})`
-                  : 'Filter by category or browse all items'}
-              </p>
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                      selectedCategory === cat
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                        : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                    selectedCategory === cat
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                      : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  {cat}
-                </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </div>
+        </main>
+      </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      </main>
+      <Footer />
     </div>
   );
 }

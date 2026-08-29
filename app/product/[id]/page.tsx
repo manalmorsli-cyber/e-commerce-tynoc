@@ -3,119 +3,113 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { mockProducts } from '@/data/products';
 import { useCart } from '@/context/CartContext';
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const id = params.id as string;
-  const { addToCart, toggleWishlist, isInWishlist } = useCart();
+  const id = params?.id as string;
+  const { addToCart, wishlist = [], toggleWishlist } = useCart();
 
-  // Recherche du produit par son ID
-  const product = mockProducts.find((p) => p.id === id);
-  const isWishlisted = product ? isInWishlist(product.id) : false;
+  // Recherche du produit par ID (sécurisé)
+  const product = mockProducts.find((p: any) => String(p.id) === String(id));
+
+  // Vérification Wishlist directe sans utiliser isInWishlist qui faisait planter la page
+  const isWishlisted = product
+    ? wishlist.some((item: any) => String(item.id) === String(product.id))
+    : false;
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex flex-col">
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-4 py-20 text-center flex-1">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Product Not Found</h1>
-          <p className="text-gray-500 mb-6">The product you are looking for does not exist or has been removed.</p>
-          <Link href="/" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors">
-            Back to Home
+        <main className="max-w-7xl mx-auto px-4 py-20 text-center flex-grow">
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Produit introuvable</h1>
+          <p className="text-slate-500 text-sm mb-6">
+            Le produit que vous cherchez n'existe pas ou a été déplacé.
+          </p>
+          <Link
+            href="/"
+            className="inline-block bg-blue-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-blue-500 transition-colors"
+          >
+            Retour à l'accueil
           </Link>
         </main>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
-        {/* Breadcrumb / Back Link */}
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 mb-8 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to products
-        </Link>
-
-        {/* Product Details Section */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-100 shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full">
+        <div className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-10 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-10">
           
-          {/* Product Image */}
-          <div className="relative aspect-square w-full bg-gray-50 rounded-2xl overflow-hidden border border-gray-100">
+          {/* Image Produit */}
+          <div className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden bg-slate-100 flex items-center justify-center">
             <img
-              src={product.imageUrl}
-              alt={product.title}
+              src={product.image}
+              alt={product.title || (product as any).name}
               className="w-full h-full object-cover"
             />
-            <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold text-gray-700">
-              {product.category}
-            </span>
+            {product.badge && (
+              <span className="absolute top-4 left-4 bg-amber-400 text-slate-950 font-black text-xs uppercase px-3 py-1 rounded-md shadow-sm">
+                {product.badge}
+              </span>
+            )}
           </div>
 
-          {/* Product Info & Actions */}
-          <div className="flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-4 mb-4">
-                <h1 className="text-3xl font-extrabold text-gray-900">{product.title}</h1>
-                <button
-                  onClick={() => toggleWishlist(product)}
-                  className="p-3 rounded-full bg-gray-50 hover:bg-rose-50 transition-colors border border-gray-100"
-                  aria-label="Wishlist"
-                >
-                  <svg
-                    className={`w-6 h-6 ${isWishlisted ? 'fill-rose-500 stroke-rose-500' : 'stroke-gray-600 fill-none'}`}
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </button>
+          {/* Informations Produit */}
+          <div className="flex flex-col justify-between space-y-6">
+            <div className="space-y-4">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                {product.category || 'Électronique'}
+              </span>
+
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+                {product.title || (product as any).name}
+              </h1>
+
+              <div className="text-3xl font-black text-slate-900">
+                ${product.price}
               </div>
 
-              {/* Rating & Stock */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center gap-1 text-amber-500 font-semibold text-sm">
-                  ★ <span>{product.rating}</span>
-                  <span className="text-gray-400 font-normal ml-1">(48 reviews)</span>
-                </div>
-                <span className="text-gray-300">•</span>
-                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${product.stock > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                  {product.stock > 0 ? `In Stock (${product.stock} available)` : 'Out of Stock'}
-                </span>
-              </div>
-
-              {/* Price */}
-              <div className="text-3xl font-extrabold text-gray-900 mb-6">
-                ${product.price.toFixed(2)}
-              </div>
-
-              {/* Description */}
-              <div className="border-t border-b border-gray-100 py-6 mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-2">Description</h3>
-                <p className="text-gray-600 leading-relaxed text-sm">{product.description}</p>
-              </div>
+              <p className="text-slate-600 text-sm leading-relaxed">
+                {product.description ||
+                  "Un produit d'exception conçu pour répondre à tous vos besoins quotidiens avec performance, élégance et durabilité."}
+              </p>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-4">
+            {/* Actions */}
+            <div className="pt-6 border-t border-slate-100 flex items-center gap-4">
               <button
                 onClick={() => addToCart(product)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-xl transition-colors active:scale-95 shadow-md flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-lg shadow-blue-600/20 text-sm cursor-pointer text-center"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                Add to Cart
+                Ajouter au Panier 🛒
+              </button>
+
+              <button
+                onClick={() => toggleWishlist(product)}
+                className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                  isWishlisted
+                    ? 'bg-rose-50 border-rose-200 text-rose-600'
+                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                }`}
+                title="Wishlist"
+              >
+                <span className="text-lg">♥</span>
               </button>
             </div>
           </div>
+
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

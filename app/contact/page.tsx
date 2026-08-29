@@ -82,7 +82,7 @@ export default function ContactPage() {
           </div>
         </main>
       </div>
-
+     <Footer />
     </div>
   );
 }

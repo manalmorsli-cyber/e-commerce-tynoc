@@ -19,24 +19,46 @@ export default function Navbar({
   onCategoryChange,
   showSearch = true,
 }: NavbarProps) {
-  const { cart, wishlist } = useCart();
-  const cartCount = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
+  const { cart = [], wishlist = [], setIsCartOpen } = useCart();
+  const cartCount = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+
+  const handleOpenCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsCartOpen(true);
+  };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-slate-200/80 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-0 md:h-20 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-6">
         
-        <Link href="/" className="shrink-0">
-          <Logo variant="light" />
-        </Link>
+        {/* LOGO */}
+        <div className="w-full md:w-auto flex items-center justify-between">
+          <Link href="/" className="shrink-0">
+            <Logo variant="light" />
+          </Link>
 
-        {showSearch ? (
-          <div className="flex-1 max-w-xl mx-2 sm:mx-4">
-            <div className="flex items-center rounded-xl border border-slate-300 bg-slate-50 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/20 overflow-hidden transition-all">
+          {/* Boutons d'action rapides (Mobile) */}
+          <div className="flex items-center gap-2 md:hidden">
+            <Link href="/wishlist" className="p-2 text-rose-500 font-bold text-sm">
+              ♥ <span className="text-xs">({wishlist.length})</span>
+            </Link>
+            <button
+              onClick={handleOpenCart}
+              className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer"
+            >
+              🛒 {cartCount}
+            </button>
+          </div>
+        </div>
+
+        {/* BARRE DE RECHERCHE AU CENTRE */}
+        {showSearch && (
+          <div className="w-full md:flex-1 md:max-w-xl">
+            <div className="flex items-center rounded-xl border border-slate-300 bg-slate-50 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/20 overflow-hidden transition-all h-10">
               <select
                 value={selectedCategory}
                 onChange={(e) => onCategoryChange && onCategoryChange(e.target.value)}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-2.5 border-r border-slate-300 outline-none cursor-pointer h-10 transition-colors"
+                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] sm:text-xs px-2.5 border-r border-slate-300 outline-none cursor-pointer h-full transition-colors shrink-0 max-w-[110px] sm:max-w-none"
               >
                 <option value="All">All Categories</option>
                 <option value="Electronics">Electronics</option>
@@ -48,27 +70,25 @@ export default function Navbar({
                 value={searchQuery}
                 onChange={(e) => onSearch && onSearch(e.target.value)}
                 placeholder="Search products..."
-                className="w-full px-3 py-2 bg-transparent text-xs text-slate-900 placeholder-slate-400 outline-none h-10"
+                className="w-full px-3 bg-transparent text-xs text-slate-900 placeholder-slate-400 outline-none h-full min-w-0"
               />
 
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 h-10 flex items-center justify-center transition-colors shrink-0">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 h-full flex items-center justify-center transition-colors shrink-0 font-bold text-xs">
                 🔍
               </button>
             </div>
           </div>
-        ) : (
-          <div className="flex-1" />
         )}
 
-        <div className="flex items-center gap-3 sm:gap-5 shrink-0">
-          {/* Lien Home obligatoire */}
+        {/* LIENS ET BOUTON PANIER (Desktop) */}
+        <div className="hidden md:flex items-center gap-4 shrink-0">
           <Link href="/" className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
             Home
           </Link>
-          <Link href="/about" className="hidden md:block text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
+          <Link href="/about" className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
             About Us
           </Link>
-          <Link href="/contact" className="hidden md:block text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
+          <Link href="/contact" className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
             Contact Us
           </Link>
 
@@ -77,7 +97,7 @@ export default function Navbar({
             className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs transition-colors border border-slate-200"
           >
             <span className="text-rose-500 text-sm">♥</span>
-            <span className="hidden sm:inline">Wishlist</span>
+            <span>Wishlist</span>
             {wishlist.length > 0 && (
               <span className="bg-amber-400 text-slate-900 font-black text-[10px] px-1.5 py-0.5 rounded-full ml-0.5">
                 {wishlist.length}
@@ -85,17 +105,19 @@ export default function Navbar({
             )}
           </Link>
 
-          <Link
-            href="/cart"
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md shadow-blue-600/20"
+          {/* CLIC SUR LE PANIER -> OUVRE LE TIROIR LATÉRAL */}
+          <button
+            onClick={handleOpenCart}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md shadow-blue-600/20 cursor-pointer"
           >
             <span>🛒</span>
             <span>Cart</span>
             <span className="bg-white/20 text-white px-2 py-0.5 rounded-md text-[10px] font-black">
               {cartCount}
             </span>
-          </Link>
+          </button>
         </div>
+
       </div>
     </header>
   );

@@ -3,124 +3,150 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
 
 export default function CheckoutPage() {
-  const context = useCart();
-  const cart = context?.cart || [];
-  const clearCart = context?.clearCart;
-  const [completed, setCompleted] = useState(false);
+  const { cart, totalPrice, clearCart } = useCart();
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const safeTotalPrice =
-    typeof context?.totalPrice === 'number'
-      ? context.totalPrice
-      : cart.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 1), 0);
+  const shipping = cart.length > 0 ? 10 : 0;
+  const grandTotal = totalPrice + shipping;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (clearCart) clearCart();
-    setCompleted(true);
+    setIsSubmitted(true);
+    clearCart();
   };
 
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <Navbar />
-
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-extrabold text-slate-900 mb-8 tracking-tight">Checkout</h1>
-
-        {completed ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 max-w-lg mx-auto shadow-sm">
-            <div className="w-16 h-16 bg-amber-400/20 text-slate-900 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-black">
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+        <Navbar showSearch={false} />
+        <main className="max-w-md mx-auto px-4 py-16 text-center flex-grow">
+          <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm space-y-4">
+            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
               ✓
             </div>
-            <h2 className="text-2xl font-black text-slate-900 mb-2">Order Confirmed</h2>
-            <p className="text-slate-600 text-xs mb-6">Thank you for your purchase. Your order is being processed for immediate dispatch.</p>
+            <h1 className="text-2xl font-black text-slate-900">Order Confirmed!</h1>
+            <p className="text-slate-500 text-xs leading-relaxed">
+              Thank you for your purchase. Your order has been placed successfully.
+            </p>
             <Link
               href="/"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3.5 rounded-xl text-xs transition-all shadow-md shadow-blue-600/20"
+              className="inline-block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition-colors shadow-md shadow-blue-600/20"
             >
-              Return Home
+              Return to Shop
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+      <Navbar showSearch={false} />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-grow w-full">
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-8 tracking-tight">
+          Checkout
+        </h1>
+
+        {cart.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-3xl border border-slate-200/80 max-w-md mx-auto space-y-4">
+            <p className="text-slate-500 text-xs">Your cart is empty.</p>
+            <Link
+              href="/"
+              className="inline-block bg-blue-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl"
+            >
+              Browse Products
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-8 shadow-sm">
-              <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
+              <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4">
+                Shipping Information
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Shipping Details</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      required
-                      placeholder="First Name"
-                      className="px-4 py-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-600"
-                    />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Last Name"
-                      className="px-4 py-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-600"
-                    />
-                  </div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">First Name</label>
                   <input
                     type="text"
                     required
-                    placeholder="Address"
-                    className="w-full mt-4 px-4 py-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-600"
+                    placeholder="John"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-600"
                   />
                 </div>
-
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Payment</h2>
-                  <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800">Card Payment</span>
-                    <span className="text-xs text-amber-500 font-extrabold">🔒 256-Bit Encrypted</span>
-                  </div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Last Name</label>
                   <input
                     type="text"
                     required
-                    placeholder="Card Number"
-                    className="w-full mt-4 px-4 py-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:border-blue-600"
+                    placeholder="Doe"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-600"
                   />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="john.doe@example.com"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Delivery Address</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="123 Main Street"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-600"
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 space-y-6">
+              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+                <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">
+                  Summary
+                </h2>
+
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Subtotal</span>
+                    <span className="font-bold text-slate-900">${totalPrice.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Shipping</span>
+                    <span className="font-bold text-slate-900">${shipping.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-100">
+                    <span>Total</span>
+                    <span className="text-blue-600">${grandTotal.toFixed(2)}</span>
+                  </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl text-xs transition-all shadow-md shadow-blue-600/20"
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-xs transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
                 >
-                  Complete Order (${safeTotalPrice.toFixed(2)})
+                  Confirm & Pay (${grandTotal.toFixed(2)})
                 </button>
-              </form>
-            </div>
-
-            <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm h-fit space-y-4">
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">Items Summary</h2>
-              <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
-                {cart.map((item: any) => (
-                  <div key={item.id} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-3">
-                      <img src={item.image} alt={item.title} className="w-10 h-10 rounded-lg object-cover bg-slate-100" />
-                      <div>
-                        <p className="font-bold text-slate-900 line-clamp-1">{item.title}</p>
-                        <span className="text-slate-400">Qty: {item.quantity}</span>
-                      </div>
-                    </div>
-                    <span className="font-bold text-slate-900">${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-t border-slate-100 pt-4 space-y-2 text-xs">
-                <div className="flex justify-between text-slate-600">
-                  <span>Total</span>
-                  <span className="text-base font-black text-blue-600">${safeTotalPrice.toFixed(2)}</span>
-                </div>
               </div>
             </div>
-          </div>
+          </form>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 }
