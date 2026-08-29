@@ -21,30 +21,32 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar onSearch={setSearchQuery} searchQuery={searchQuery} />
 
-      {/* Hero Carousel Pleine Largeur */}
       <HeroCarousel />
 
-      {/* Section Produits avec conteneur centré */}
       <main id="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-2">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all ${
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
                   selectedCategory === category
-                    ? 'bg-slate-900 text-white shadow-sm'
-                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
                 }`}
               >
                 {category}
               </button>
             ))}
           </div>
+
+          <span className="text-xs font-bold text-slate-400">
+            {filteredProducts.length} items found
+          </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
