@@ -1,89 +1,89 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import Logo from '@/components/Logo';
 import { useCart } from '@/context/CartContext';
 
 interface NavbarProps {
-  onSearch?: (query: string) => void;
   searchQuery?: string;
+  onSearch?: (query: string) => void;
+  selectedCategory?: string;
+  onCategoryChange?: (category: string) => void;
 }
 
-export default function Navbar({ onSearch, searchQuery = '' }: NavbarProps) {
-  const { totalItems, wishlist } = useCart();
-  const pathname = usePathname();
-
-  const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'About Us', href: '/about' },
-    { name: 'Contact Us', href: '/contact' },
-  ];
+export default function Navbar({
+  searchQuery = '',
+  onSearch,
+  selectedCategory = 'All',
+  onCategoryChange,
+}: NavbarProps) {
+  const { cart, wishlist } = useCart();
+  const cartCount = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-6">
+    <header className="sticky top-0 z-50 bg-white border-b border-slate-200/80 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 sm:gap-8">
         
-        {/* Logo */}
-        <Link href="/">
+        <Link href="/" className="shrink-0">
           <Logo />
         </Link>
 
-        {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className={`text-sm font-semibold transition-colors ${
-                pathname === link.href ? 'text-blue-600' : 'text-slate-600 hover:text-slate-900'
-              }`}
+        {/* Barre de Recherche Style Amazon avec Sélecteur de Catégorie */}
+        <div className="flex-1 max-w-2xl">
+          <div className="flex items-center rounded-xl border border-slate-300 bg-slate-50 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/20 overflow-hidden transition-all">
+            <select
+              value={selectedCategory}
+              onChange={(e) => onCategoryChange && onCategoryChange(e.target.value)}
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-2.5 border-r border-slate-300 outline-none cursor-pointer h-10 transition-colors"
             >
-              {link.name}
-            </Link>
-          ))}
-        </nav>
+              <option value="All">Toutes catégories</option>
+              <option value="Electronics">Électronique</option>
+              <option value="Accessories">Accessoires</option>
+            </select>
 
-        {/* Search Bar */}
-        <div className="flex-1 max-w-sm hidden lg:block">
-          <div className="relative">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearch && onSearch(e.target.value)}
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-2 rounded-full bg-slate-100/80 text-xs border border-transparent focus:bg-white focus:border-slate-300 focus:outline-none transition-all text-slate-800"
+              placeholder="Rechercher un produit, une marque..."
+              className="w-full px-3 py-2 bg-transparent text-xs text-slate-900 placeholder-slate-400 outline-none h-10"
             />
-            <svg className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 h-10 flex items-center justify-center transition-colors shrink-0">
+              🔍
+            </button>
           </div>
         </div>
 
-        {/* User Actions */}
-        <div className="flex items-center gap-4">
-          <Link href="/wishlist" className="relative p-2 text-slate-700 hover:text-rose-500 transition-colors">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
+        {/* Liens rapides & Panier */}
+        <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+          <Link href="/about" className="hidden md:block text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
+            À propos
+          </Link>
+          <Link href="/contact" className="hidden md:block text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
+            Contact
+          </Link>
+
+          <Link href="/wishlist" className="relative p-2 text-slate-600 hover:text-amber-500 transition-colors">
+            <span className="text-lg">♥</span>
             {wishlist.length > 0 && (
-              <span className="absolute top-0 right-0 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-900 font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
                 {wishlist.length}
               </span>
             )}
           </Link>
 
-          <Link href="/cart" className="flex items-center gap-2.5 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            <span>Cart</span>
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px]">
-              {totalItems}
+          <Link
+            href="/cart"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all shadow-md shadow-blue-600/20"
+          >
+            <span>🛒</span>
+            <span>Panier</span>
+            <span className="bg-white/20 text-white px-2 py-0.5 rounded-md text-[10px] font-black">
+              {cartCount}
             </span>
           </Link>
         </div>
-
       </div>
     </header>
   );
