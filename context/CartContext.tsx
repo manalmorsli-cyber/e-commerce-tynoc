@@ -1,107 +1,91 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product, CartItem } from '@/types/product';
 
 interface CartContextType {
-  cart: CartItem[];
-  wishlist: Product[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  cart: any[];
+  wishlist: any[];
+  addToCart: (product: any) => void;
+  removeFromCart: (id: string | number) => void;
+  updateQuantity: (id: string | number, quantity: number) => void;
+  toggleWishlist: (product: any) => void;
   clearCart: () => void;
-  toggleWishlist: (product: Product) => void;
-  isInWishlist: (productId: string) => boolean;
-  totalItems: number;
-  subtotal: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<Product[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [cart, setCart] = useState<any[]>([]);
+  const [wishlist, setWishlist] = useState<any[]>([]);
 
-  // 1. Lire depuis localStorage une seule fois au montage
   useEffect(() => {
     try {
-      const savedCart = localStorage.getItem('veloce_cart');
-      const savedWishlist = localStorage.getItem('veloce_wishlist');
-
+      const savedCart = localStorage.getItem('cart');
+      const savedWishlist = localStorage.getItem('wishlist');
       if (savedCart) setCart(JSON.parse(savedCart));
       if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
-    } catch (error) {
-      console.error('Failed to load storage:', error);
-    } finally {
-      setIsInitialized(true); // Autorise les sauvegardes futures
+    } catch (e) {
+      console.error('Failed to load cart from localStorage', e);
     }
   }, []);
 
-  // 2. Sauvegarder le panier UNIQUEMENT après la lecture initiale
   useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('veloce_cart', JSON.stringify(cart));
-    }
-  }, [cart, isInitialized]);
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
-  // 3. Sauvegarder la wishlist UNIQUEMENT après la lecture initiale
   useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('veloce_wishlist', JSON.stringify(wishlist));
-    }
-  }, [wishlist, isInitialized]);
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
 
-  const addToCart = (product: Product) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.product.id === product.id);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+  const addToCart = (product: any) => {
+    setCart((prev) => {
+      const existing = prev.find((item) => String(item.id) === String(product.id));
+      if (existing) {
+        return prev.map((item) =>
+          String(item.id) === String(product.id)
+            ? { ...item, quantity: (Number(item.quantity) || 1) + 1 }
             : item
         );
       }
-      return [...prevCart, { product, quantity: 1 }];
+      return [
+        ...prev,
+        {
+          ...product,
+          price: Number(product.price) || 0,
+          quantity: 1,
+        },
+      ];
     });
   };
 
-  const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
+  const removeFromCart = (id: string | number) => {
+    setCart((prev) => prev.filter((item, index) => String(item.id ?? index) !== String(id)));
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
+  const updateQuantity = (id: string | number, quantity: number) => {
+    setCart((prev) =>
+      prev.map((item, index) =>
+        String(item.id ?? index) === String(id)
+          ? { ...item, quantity: Math.max(1, Number(quantity) || 1) }
+          : item
       )
     );
   };
 
-  const clearCart = () => {
-    setCart([]);
-  };
-
-  const toggleWishlist = (product: Product) => {
-    setWishlist((prevWishlist) => {
-      const exists = prevWishlist.some((p) => p.id === product.id);
+  const toggleWishlist = (product: any) => {
+    setWishlist((prev) => {
+      const exists = prev.some((item) => String(item.id) === String(product.id));
       if (exists) {
-        return prevWishlist.filter((p) => p.id !== product.id);
+        return prev.filter((item) => String(item.id) !== String(product.id));
       }
-      return [...prevWishlist, product];
+      return [...prev, product];
     });
   };
 
-  const isInWishlist = (productId: string) => {
-    return wishlist.some((p) => p.id === productId);
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('cart');
   };
-
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   return (
     <CartContext.Provider
@@ -111,11 +95,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addToCart,
         removeFromCart,
         updateQuantity,
-        clearCart,
         toggleWishlist,
-        isInWishlist,
-        totalItems,
-        subtotal,
+        clearCart,
       }}
     >
       {children}
