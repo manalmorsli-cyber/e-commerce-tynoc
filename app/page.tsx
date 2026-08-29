@@ -2,59 +2,100 @@
 
 import { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import HeroCarousel from '@/components/HeroCarousel';
+import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { mockProducts } from '@/data/products';
+
+const initialProducts = [
+  {
+    id: '1',
+    title: 'Pro Wireless Headphones',
+    description: 'Active noise cancellation, 30-hour battery life, and premium spatial sound quality.',
+    price: 199,
+    category: 'Electronics',
+    badge: 'BEST SELLER',
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80',
+    rating: 4.8,
+  },
+  {
+    id: '2',
+    title: 'Smart Fitness Watch',
+    description: 'Heart rate tracking, built-in GPS, active sleep monitoring, and water-resistant up to 50m.',
+    price: 149,
+    category: 'Electronics',
+    badge: 'SPEED EDITION',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80',
+    rating: 4.5,
+  },
+  {
+    id: '3',
+    title: 'Ergonomic Laptop Backpack',
+    description: 'Smart storage, 15-inch padded laptop compartment, and durable water-resistant fabric.',
+    price: 89,
+    category: 'Accessories',
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80',
+    rating: 4.6,
+  },
+  {
+    id: '4',
+    title: 'Minimalist Desk Mat',
+    description: 'Premium vegan leather desk pad, waterproof surface, and anti-slip rubber base.',
+    price: 35,
+    category: 'Accessories',
+    image: 'https://images.unsplash.com/photo-1616410011236-7a42121dd981?w=500&q=80',
+    rating: 4.9,
+  },
+];
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const categories = ['All', ...Array.from(new Set(mockProducts.map((p) => p.category)))];
-
-  const filteredProducts = mockProducts.filter((product) => {
-    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+  const filteredProducts = initialProducts.filter((product) => {
     const matchesSearch =
       product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <Navbar onSearch={setSearchQuery} searchQuery={searchQuery} />
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
+      <div>
+        <Navbar
+          searchQuery={searchQuery}
+          onSearch={setSearchQuery}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          showSearch={true}
+        />
 
-      <HeroCarousel />
-
-      <main id="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                  selectedCategory === category
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-2xl font-black text-slate-900">Featured Products</h1>
+            <span className="text-xs font-semibold text-slate-500">
+              Showing {filteredProducts.length} items
+            </span>
           </div>
 
-          <span className="text-xs font-bold text-slate-400">
-            {filteredProducts.length} items found
-          </span>
-        </div>
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm max-w-md mx-auto">
+              <span className="text-3xl block mb-2">🔍</span>
+              <h3 className="text-sm font-bold text-slate-900">No products found</h3>
+              <p className="text-slate-500 text-xs mt-1">
+                Try searching for something else or change category filter.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </main>
+
     </div>
   );
 }
