@@ -1,149 +1,210 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
+import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
-  const { cart, totalPrice, clearCart } = useCart();
+  const { cart = [] } = useCart();
+  const [isMounted, setIsMounted] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const router = useRouter();
 
-  const shipping = cart.length > 0 ? 10 : 0;
-  const grandTotal = totalPrice + shipping;
+  // État du formulaire
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    address: '',
+  });
+
+  // État des erreurs
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const subtotal = isMounted && cart.length > 0
+    ? cart.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0)
+    : 0;
+
+  const shipping = subtotal > 0 ? 10 : 0;
+  const totalPrice = subtotal + shipping;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: '' });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Enter a valid email address';
+    }
+    if (!formData.address.trim()) newErrors.address = 'Shipping address is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    clearCart();
+    if (validateForm()) {
+      setIsSubmitted(true);
+    }
   };
-
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
-        <Navbar showSearch={false} />
-        <main className="max-w-md mx-auto px-4 py-16 text-center flex-grow">
-          <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm space-y-4">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
-              ✓
-            </div>
-            <h1 className="text-2xl font-black text-slate-900">Order Confirmed!</h1>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              Thank you for your purchase. Your order has been placed successfully.
-            </p>
-            <Link
-              href="/"
-              className="inline-block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition-colors shadow-md shadow-blue-600/20"
-            >
-              Return to Shop
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
       <Navbar showSearch={false} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-grow w-full">
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-8 tracking-tight">
-          Checkout
-        </h1>
-
-        {cart.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-3xl border border-slate-200/80 max-w-md mx-auto space-y-4">
-            <p className="text-slate-500 text-xs">Your cart is empty.</p>
+      <main className="flex-grow py-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-6 flex items-center justify-between">
             <Link
               href="/"
-              className="inline-block bg-blue-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl"
+              className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-1"
             >
-              Browse Products
+              ← Back to Store
             </Link>
+            <h1 className="text-2xl font-black text-slate-900">Checkout</h1>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-sm space-y-6">
-              <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4">
-                Shipping Information
-              </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">First Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="John"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-600"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Last Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Doe"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-600"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
-                <input
-                  type="email"
-                  required
-                  placeholder="john.doe@example.com"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-600"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Delivery Address</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="123 Main Street"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-600"
-                />
-              </div>
+          {isSubmitted ? (
+            <div className="bg-white p-8 rounded-3xl border border-slate-200/80 shadow-sm text-center max-w-md mx-auto space-y-4">
+              <div className="text-5xl">🎉</div>
+              <h2 className="text-xl font-bold text-slate-900">Order Confirmed!</h2>
+              <p className="text-xs text-slate-500">
+                Thank you, <span className="font-semibold text-slate-700">{formData.firstName}</span>. A confirmation email has been sent to <span className="font-semibold text-slate-700">{formData.email}</span>.
+              </p>
+              <button
+                onClick={() => router.push('/')}
+                className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer"
+              >
+                Return to Home
+              </button>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Formulaire de livraison avec validation */}
+              <form onSubmit={handleSubmit} className="md:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+                <h2 className="text-base font-bold text-slate-900 mb-2">Shipping Details</h2>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">First Name *</label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      placeholder="John"
+                      className={`w-full px-3 py-2 text-xs border ${errors.firstName ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
+                    />
+                    {errors.firstName && <span className="text-[10px] text-red-500 mt-1 block">{errors.firstName}</span>}
+                  </div>
 
-            <div className="lg:col-span-5 space-y-6">
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm space-y-4">
-                <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">
-                  Summary
-                </h2>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">Last Name *</label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder="Doe"
+                      className={`w-full px-3 py-2 text-xs border ${errors.lastName ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
+                    />
+                    {errors.lastName && <span className="text-[10px] text-red-500 mt-1 block">{errors.lastName}</span>}
+                  </div>
+                </div>
 
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between text-slate-600">
-                    <span>Subtotal</span>
-                    <span className="font-bold text-slate-900">${totalPrice.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Shipping</span>
-                    <span className="font-bold text-slate-900">${shipping.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm font-black text-slate-900 pt-2 border-t border-slate-100">
-                    <span>Total</span>
-                    <span className="text-blue-600">${grandTotal.toFixed(2)}</span>
-                  </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="john@example.com"
+                    className={`w-full px-3 py-2 text-xs border ${errors.email ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
+                  />
+                  {errors.email && <span className="text-[10px] text-red-500 mt-1 block">{errors.email}</span>}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Address *</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="123 Main Street"
+                    className={`w-full px-3 py-2 text-xs border ${errors.address ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
+                  />
+                  {errors.address && <span className="text-[10px] text-red-500 mt-1 block">{errors.address}</span>}
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-xs transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
+                  disabled={cart.length === 0}
+                  className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-blue-600/20 cursor-pointer disabled:cursor-not-allowed"
                 >
-                  Confirm & Pay (${grandTotal.toFixed(2)})
+                  Confirm Order (${(totalPrice || 0).toFixed(2)})
                 </button>
+              </form>
+
+              {/* Résumé de la commande */}
+              <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm h-fit space-y-4">
+                <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">
+                  Order Summary
+                </h2>
+
+                {cart.length === 0 ? (
+                  <p className="text-xs text-slate-400 py-4 text-center">Your cart is empty.</p>
+                ) : (
+                  <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                    {cart.map((item) => (
+                      <div key={item.id} className="flex justify-between items-center text-xs">
+                        <span className="font-medium text-slate-700 truncate max-w-[160px]">
+                          {item.title} (x{item.quantity})
+                        </span>
+                        <span className="font-bold text-slate-900">
+                          ${((Number(item.price) || 0) * (item.quantity || 1)).toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="border-t border-slate-100 pt-3 space-y-2 text-xs">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Subtotal</span>
+                    <span className="font-bold text-slate-900">${(subtotal || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Shipping</span>
+                    <span className="font-bold text-slate-900">${(shipping || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-900 font-black text-sm pt-2 border-t border-slate-100">
+                    <span>Total</span>
+                    <span className="text-blue-600">${(totalPrice || 0).toFixed(2)}</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </form>
-        )}
+          )}
+        </div>
       </main>
 
       <Footer />
