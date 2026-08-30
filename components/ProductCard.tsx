@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
 
 interface Product {
   id: string;
@@ -16,17 +16,29 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { addToCart, toggleWishlist, wishlist = [] } = useCart();
+  
+  // Vérifie si le produit est déjà dans la wishlist
+  const isFavorite = wishlist.some((item: any) => item.id === product.id);
 
-  const toggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault(); // Évite de naviguer vers la page produit lors du clic sur le cœur
-    setIsFavorite(!isFavorite);
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (toggleWishlist) {
+      toggleWishlist(product);
+    }
+  };
+
+  const handleAddToCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (addToCart) {
+      addToCart(product);
+    }
   };
 
   return (
     <div className="bg-white rounded-3xl border border-slate-200/80 p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all relative group">
       <div>
-        {/* Product Image Container */}
+        {/* Container Image */}
         <div className="relative w-full h-48 mb-4 rounded-2xl overflow-hidden bg-slate-100">
           {product.badge && (
             <span className="absolute top-3 left-3 z-10 bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
@@ -34,10 +46,10 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
 
-          {/* Heart / Wishlist Button */}
+          {/* Bouton Favoris (Cœur) */}
           <button
             type="button"
-            onClick={toggleFavorite}
+            onClick={handleFavoriteClick}
             aria-label="Add to wishlist"
             className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-md text-slate-600 hover:text-red-500 hover:bg-white transition-all shadow-sm cursor-pointer"
           >
@@ -48,7 +60,7 @@ export default function ProductCard({ product }: { product: Product }) {
               strokeWidth={1.8}
               stroke="currentColor"
               className={`w-5 h-5 transition-colors ${
-                isFavorite ? 'text-red-500' : 'text-slate-600'
+                isFavorite ? 'text-red-500 fill-red-500' : 'text-slate-600'
               }`}
             >
               <path
@@ -66,12 +78,12 @@ export default function ProductCard({ product }: { product: Product }) {
           />
         </div>
 
-        {/* Category */}
+        {/* Catégorie */}
         <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider">
           {product.category}
         </span>
 
-        {/* Title Link */}
+        {/* Titre */}
         <Link href={`/product/${product.id}`} className="block mt-1">
           <h3 className="font-bold text-slate-900 text-base hover:text-blue-600 transition-colors line-clamp-1">
             {product.title}
@@ -84,7 +96,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </p>
       </div>
 
-      {/* Footer / Price & CTA */}
+      {/* Prix & Bouton Ajout Panier */}
       <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
         <div>
           <span className="text-[10px] text-slate-400 block uppercase font-medium">Price</span>
@@ -93,7 +105,8 @@ export default function ProductCard({ product }: { product: Product }) {
 
         <button
           type="button"
-          className="px-4 py-2 bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
+          onClick={handleAddToCartClick}
+          className="px-4 py-2 bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer active:scale-95"
         >
           Add to Cart
         </button>
