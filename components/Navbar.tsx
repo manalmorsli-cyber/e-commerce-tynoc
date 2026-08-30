@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavbarProps {
   searchQuery?: string;
@@ -22,6 +23,7 @@ export default function Navbar({
 }: NavbarProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { cart = [], wishlist = [], setIsCartOpen } = useCart();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     setIsMounted(true);
@@ -92,12 +94,6 @@ export default function Navbar({
           <Link href="/" className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
             Home
           </Link>
-          <Link href="/about" className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
-            About Us
-          </Link>
-          <Link href="/contact" className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
-            Contact Us
-          </Link>
 
           <Link
             href="/wishlist"
@@ -112,7 +108,7 @@ export default function Navbar({
             )}
           </Link>
 
-          {/* CLIC SUR LE PANIER -> OUVRE LE TIROIR LATÉRAL */}
+          {/* CLIC SUR LE PANIER */}
           <button
             onClick={handleOpenCart}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md shadow-blue-600/20 cursor-pointer"
@@ -123,6 +119,26 @@ export default function Navbar({
               {isMounted ? cartCount : 0}
             </span>
           </button>
+
+          {/* USER AUTH STATE */}
+          {isMounted && user ? (
+            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+              <span className="text-xs font-bold text-slate-800">👤 {user.name}</span>
+              <button
+                onClick={logout}
+                className="text-xs font-medium text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="text-xs font-bold text-blue-600 border border-blue-600/30 hover:bg-blue-50 px-3 py-2 rounded-xl transition-colors"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
 
       </div>
