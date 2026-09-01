@@ -11,22 +11,46 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Basic frontend validation
     if (!email.trim() || !password.trim()) {
       setError('Please fill in all fields.');
       return;
     }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
 
-    login(email);
-    router.push('/');
+    setError('');
+    setLoading(true);
+
+    try {
+      // 1. Call the login API route
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to login');
+      }
+
+      // 2. Update global authentication state
+      login(data.user);
+      
+      // 3. Redirect user to the homepage
+      router.push('/');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,9 +61,10 @@ export default function LoginPage() {
         <div className="w-full max-w-md bg-white p-8 rounded-3xl border border-slate-200/80 shadow-sm space-y-6">
           <div className="text-center">
             <h1 className="text-2xl font-black text-slate-900">Welcome Back</h1>
-            <p className="text-xs text-slate-500 mt-1">Sign in to your account to continue</p>
+            <p className="text-xs text-slate-500 mt-1">Sign in to access your account</p>
           </div>
 
+          {/* Display error message if authentication fails */}
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs">
               {error}
@@ -54,7 +79,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="john@example.com"
-                className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50"
+                className="w-full px-3 py-2.5 text-xs text-slate-900 font-medium placeholder:text-slate-400 border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50"
               />
             </div>
 
@@ -65,15 +90,16 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50"
+                className="w-full px-3 py-2.5 text-xs text-slate-900 font-medium placeholder:text-slate-400 border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shadow-lg shadow-blue-600/20 cursor-pointer"
+              disabled={loading}
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold rounded-xl text-xs transition-colors shadow-lg shadow-blue-600/20 cursor-pointer"
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 

@@ -12,10 +12,11 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { register } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth(); 
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !password.trim()) {
       setError('Please fill in all fields.');
@@ -30,8 +31,29 @@ export default function RegisterPage() {
       return;
     }
 
-    register(name, email);
-    router.push('/');
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to register');
+      }
+
+      login(data.user);
+      router.push('/');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,7 +81,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
-                className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50"
+                className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50 text-slate-900 font-medium placeholder:text-slate-400"
               />
             </div>
 
@@ -70,7 +92,7 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="john@example.com"
-                className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50"
+                className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50 text-slate-900 font-medium placeholder:text-slate-400"
               />
             </div>
 
@@ -81,15 +103,16 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50"
+                className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl outline-none focus:border-blue-600 bg-slate-50 text-slate-900 font-medium placeholder:text-slate-400"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shadow-lg shadow-blue-600/20 cursor-pointer"
+              disabled={loading}
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold rounded-xl text-xs transition-colors shadow-lg shadow-blue-600/20 cursor-pointer"
             >
-              Sign Up
+              {loading ? 'Signing up...' : 'Sign Up'}
             </button>
           </form>
 

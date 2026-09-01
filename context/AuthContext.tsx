@@ -11,8 +11,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, name?: string) => void;
-  register: (name: string, email: string) => void;
+  login: (userData: User) => void;
   logout: () => void;
   isMounted: boolean;
 }
@@ -33,24 +32,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = (email: string, name?: string) => {
-    const userData: User = {
-      id: Date.now().toString(),
-      name: name || email.split('@')[0],
-      email,
-      role: 'user',
-    };
-    setUser(userData);
-    localStorage.setItem('tynoc_user', JSON.stringify(userData));
-  };
-
-  const register = (name: string, email: string) => {
-    const userData: User = {
-      id: Date.now().toString(),
-      name,
-      email,
-      role: 'user',
-    };
+  // La fonction login prend maintenant l'objet User complet
+  const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem('tynoc_user', JSON.stringify(userData));
   };
@@ -61,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isMounted }}>
+    <AuthContext.Provider value={{ user, login, logout, isMounted }}>
       {children}
     </AuthContext.Provider>
   );

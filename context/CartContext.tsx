@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from './AuthContext';
 
 export interface CartItem {
   id: string;
@@ -21,6 +22,7 @@ interface CartContextType {
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   toggleWishlist: (product: any) => void;
+  clearCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -30,63 +32,123 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<any[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  const { user } = useAuth();
   const router = useRouter();
 
+  // Load Cart and Wishlist on login state change (or reset on logout)
   useEffect(() => {
     setIsMounted(true);
-    const savedCart = localStorage.getItem('tynoc_cart');
-    const savedWishlist = localStorage.getItem('tynoc_wishlist');
-    if (savedCart) try { setCart(JSON.parse(savedCart)); } catch (e) {}
-    if (savedWishlist) try { setWishlist(JSON.parse(savedWishlist)); } catch (e) {}
-  }, []);
 
-  useEffect(() => {
-    if (isMounted) {
-      localStorage.setItem('tynoc_cart', JSON.stringify(cart));
-    }
-  }, [cart, isMounted]);
+    const loadUserData = async () => {
+      // IF LOGGED IN: Fetch Cart & Wishlist from DynamoDB
+      if (user?.id) {
+        try {
+          const [cartRes, wishlistRes] = await Promise.all([
+            fetch(`/api/cart?userId=${user.id}`),
+            fetch(`/api/wishlist?userId=${user.id}`),
+          ]);
 
-  useEffect(() => {
-    if (isMounted) {
-      localStorage.setItem('tynoc_wishlist', JSON.stringify(wishlist));
+          const cartData = await cartRes.json();
+          const wishlistData = await wishlistRes.json();
+
+          if (cartRes.ok) setCart(cartData.items || []);
+          if (wishlistRes.ok) setWishlist(wishlistData.items || []);
+        } catch (e) {
+          console.error('Error fetching user data:', e);
+        }
+      } else {
+        // IF LOGGED OUT: Load separate Guest Cart and Guest Wishlist from localStorage
+        const savedGuestCart = localStorage.getItem('tynoc_guest_cart');
+        const savedGuestWishlist = localStorage.getItem('tynoc_guest_wishlist');
+
+        setCart(savedGuestCart ? JSON.parse(savedGuestCart) : []);
+        setWishlist(savedGuestWishlist ? JSON.parse(savedGuestWishlist) : []);
+      }
+    };
+
+    loadUserData();
+  }, [user]);
+
+  // Sync Cart changes with DB (User) or LocalStorage (Guest)
+  const syncCart = async (newCart: CartItem[]) => {
+    setCart(newCart);
+
+    if (user?.id) {
+      try {
+        await fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, items: newCart }),
+        });
+      } catch (e) {
+        console.error('Failed to sync cart:', e);
+      }
+    } else if (typeof window !== 'undefined') {
+      localStorage.setItem('tynoc_guest_cart', JSON.stringify(newCart));
     }
-  }, [wishlist, isMounted]);
+  };
+
+  // Sync Wishlist changes with DB (User) or LocalStorage (Guest)
+  const syncWishlist = async (newWishlist: any[]) => {
+    setWishlist(newWishlist);
+
+    if (user?.id) {
+      try {
+        await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, items: newWishlist }),
+        });
+      } catch (e) {
+        console.error('Failed to sync wishlist:', e);
+      }
+    } else if (typeof window !== 'undefined') {
+      localStorage.setItem('tynoc_guest_wishlist', JSON.stringify(newWishlist));
+    }
+  };
 
   const addToCart = (product: any) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
+    const existing = cart.find((item) => item.id === product.id);
+    let updatedCart: CartItem[];
+
+    if (existing) {
+      updatedCart = cart.map((item) =>
+        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    } else {
+      updatedCart = [...cart, { ...product, quantity: product.quantity || 1 }];
+    }
+
+    syncCart(updatedCart);
     setIsCartOpen(true);
   };
 
   const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
+    syncCart(cart.filter((item) => item.id !== productId));
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId);
     } else {
-      setCart((prev) =>
-        prev.map((item) => (item.id === productId ? { ...item, quantity } : item))
+      syncCart(
+        cart.map((item) => (item.id === productId ? { ...item, quantity } : item))
       );
     }
   };
 
   const toggleWishlist = (product: any) => {
-    setWishlist((prev) => {
-      const exists = prev.some((item) => item.id === product.id);
-      if (exists) {
-        return prev.filter((item) => item.id !== product.id);
-      }
-      return [...prev, product];
-    });
+    const exists = wishlist.some((item) => item.id === product.id);
+    const updatedWishlist = exists
+      ? wishlist.filter((item) => item.id !== product.id)
+      : [...wishlist, product];
+
+    syncWishlist(updatedWishlist);
+  };
+
+  const clearCart = () => {
+    syncCart([]);
   };
 
   const handleCheckout = () => {
@@ -108,6 +170,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeFromCart,
         updateQuantity,
         toggleWishlist,
+        clearCart,
       }}
     >
       {children}
@@ -172,7 +235,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                         </div>
                       </div>
 
-                      {/* Icône SVG Poubelle */}
                       <button
                         onClick={() => removeFromCart(item.id)}
                         className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"

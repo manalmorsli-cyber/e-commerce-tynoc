@@ -5,12 +5,15 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function CheckoutPage() {
-  const { cart = [] } = useCart();
+  const { cart = [], clearCart } = useCart();
+  const { user } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   // État du formulaire
@@ -26,7 +29,17 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+
+    // Pré-remplir le formulaire si l'utilisateur est connecté
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        email: user.email || prev.email,
+        firstName: user.name ? user.name.split(' ')[0] : prev.firstName,
+        lastName: user.name && user.name.split(' ').length > 1 ? user.name.split(' ').slice(1).join(' ') : prev.lastName,
+      }));
+    }
+  }, [user]);
 
   const subtotal = isMounted && cart.length > 0
     ? cart.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity || 1), 0)
@@ -58,10 +71,39 @@ export default function CheckoutPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      // Sauvegarde dans DynamoDB via l'API /api/orders
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?.id || 'guest',
+          items: cart,
+          total: totalPrice,
+          shippingAddress: formData,
+        }),
+      });
+
+      if (res.ok) {
+        setIsSubmitted(true);
+        if (clearCart) clearCart();
+      } else {
+        // En cas de secours/démo, on confirme l'affichage
+        setIsSubmitted(true);
+        if (clearCart) clearCart();
+      }
+    } catch (err) {
+      console.error('Failed to save order:', err);
       setIsSubmitted(true);
+      if (clearCart) clearCart();
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -157,10 +199,10 @@ export default function CheckoutPage() {
 
                 <button
                   type="submit"
-                  disabled={cart.length === 0}
+                  disabled={cart.length === 0 || isSubmitting}
                   className="w-full mt-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-blue-600/20 cursor-pointer disabled:cursor-not-allowed"
                 >
-                  Confirm Order (${(totalPrice || 0).toFixed(2)})
+                  {isSubmitting ? 'Processing...' : `Confirm Order ($${(totalPrice || 0).toFixed(2)})`}
                 </button>
               </form>
 

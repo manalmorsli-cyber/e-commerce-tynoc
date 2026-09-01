@@ -1,21 +1,31 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/dynamodb';
-import { ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand } from '@aws-sdk/lib-dynamodb';
 
-export async function GET() {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const tableName = process.env.DYNAMODB_PRODUCTS_TABLE || 'Products';
+    const { id } = params;
+
     const response = await db.send(
-      new ScanCommand({
+      new GetCommand({
         TableName: tableName,
+        Key: { id },
       })
     );
 
-    return NextResponse.json(response.Items || []);
+    if (!response.Item) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(response.Item, { status: 200 });
   } catch (error) {
-    console.error('Failed to fetch products from DynamoDB:', error);
+    console.error('Failed to fetch product:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch products' },
+      { error: 'Internal Server Error' },
       { status: 500 }
     );
   }
