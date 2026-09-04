@@ -17,12 +17,15 @@ export async function GET() {
   try {
     const response = await db.send(
       new ScanCommand({
-        TableName: 'Products',
+        TableName: 'Categories',
       })
     );
     return NextResponse.json(response.Items || [], { status: 200 });
   } catch (error: any) {
-    console.error('Error fetching products:', error);
-    return NextResponse.json([], { status: 500 });
+    console.error('Error fetching categories:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch categories' },
+      { status: 500 }
+    );
   }
 }

@@ -3,25 +3,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './AuthContext';
-
-export interface CartItem {
-  id: string;
-  title: string;
-  price: number;
-  image: string;
-  quantity: number;
-  category?: string;
-}
+import { Product, CartItem } from '@/types';
 
 interface CartContextType {
   cart: CartItem[];
-  wishlist: any[];
+  wishlist: Product[];
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
-  addToCart: (product: any) => void;
+  addToCart: (product: Product | (CartItem & Product)) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
-  toggleWishlist: (product: any) => void;
+  toggleWishlist: (product: Product) => void;
   clearCart: () => void;
 }
 
@@ -29,19 +21,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<any[]>([]);
+  const [wishlist, setWishlist] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   const { user } = useAuth();
   const router = useRouter();
 
-  // Load Cart and Wishlist on login state change (or reset on logout)
   useEffect(() => {
     setIsMounted(true);
 
     const loadUserData = async () => {
-      // IF LOGGED IN: Fetch Cart & Wishlist from DynamoDB
       if (user?.id) {
         try {
           const [cartRes, wishlistRes] = await Promise.all([
@@ -58,7 +48,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           console.error('Error fetching user data:', e);
         }
       } else {
-        // IF LOGGED OUT: Load separate Guest Cart and Guest Wishlist from localStorage
         const savedGuestCart = localStorage.getItem('tynoc_guest_cart');
         const savedGuestWishlist = localStorage.getItem('tynoc_guest_wishlist');
 
@@ -70,7 +59,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     loadUserData();
   }, [user]);
 
-  // Sync Cart changes with DB (User) or LocalStorage (Guest)
   const syncCart = async (newCart: CartItem[]) => {
     setCart(newCart);
 
@@ -89,8 +77,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Sync Wishlist changes with DB (User) or LocalStorage (Guest)
-  const syncWishlist = async (newWishlist: any[]) => {
+  const syncWishlist = async (newWishlist: Product[]) => {
     setWishlist(newWishlist);
 
     if (user?.id) {
@@ -108,16 +95,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addToCart = (product: any) => {
-    const existing = cart.find((item) => item.id === product.id);
+  const addToCart = (product: Product | any) => {
+    const existing = cart.find((item) => String(item.id) === String(product.id));
     let updatedCart: CartItem[];
 
     if (existing) {
       updatedCart = cart.map((item) =>
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        String(item.id) === String(product.id) ? { ...item, quantity: item.quantity + 1 } : item
       );
     } else {
-      updatedCart = [...cart, { ...product, quantity: product.quantity || 1 }];
+      const newItem: CartItem = {
+        id: product.id,
+        title: product.title,
+        price: Number(product.price),
+        image: product.image,
+        quantity: product.quantity || 1,
+        category: product.category,
+      };
+      updatedCart = [...cart, newItem];
     }
 
     syncCart(updatedCart);
@@ -125,7 +120,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const removeFromCart = (productId: string) => {
-    syncCart(cart.filter((item) => item.id !== productId));
+    syncCart(cart.filter((item) => String(item.id) !== String(productId)));
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -133,15 +128,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeFromCart(productId);
     } else {
       syncCart(
-        cart.map((item) => (item.id === productId ? { ...item, quantity } : item))
+        cart.map((item) => (String(item.id) === String(productId) ? { ...item, quantity } : item))
       );
     }
   };
 
-  const toggleWishlist = (product: any) => {
-    const exists = wishlist.some((item) => item.id === product.id);
+  const toggleWishlist = (product: Product) => {
+    const exists = wishlist.some((item) => String(item.id) === String(product.id));
     const updatedWishlist = exists
-      ? wishlist.filter((item) => item.id !== product.id)
+      ? wishlist.filter((item) => String(item.id) !== String(product.id))
       : [...wishlist, product];
 
     syncWishlist(updatedWishlist);
@@ -175,7 +170,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     >
       {children}
 
-      {/* PANNEAU LATÉRAL DU PANIER */}
       {isMounted && isCartOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm transition-opacity">
           <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between p-6 overflow-y-auto">

@@ -50,7 +50,6 @@ export default function ProductCarousel({ products, title }: ProductCarouselProp
         </div>
       </div>
 
-      {/* Conteneur défilant compact */}
       <div
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto scrollbar-none scroll-smooth py-2 -mx-2 px-2"

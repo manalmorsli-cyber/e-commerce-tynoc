@@ -18,7 +18,7 @@ interface Product {
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart, toggleWishlist, wishlist = [] } = useCart();
   
-  // Vérifie si le produit est déjà dans la wishlist
+  // verify product in wishlist
   const isFavorite = wishlist.some((item: any) => item.id === product.id);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -46,7 +46,7 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
 
-          {/* Bouton Favoris (Cœur) */}
+          {/* wishlist button */}
           <button
             type="button"
             onClick={handleFavoriteClick}
@@ -78,12 +78,12 @@ export default function ProductCard({ product }: { product: Product }) {
           />
         </div>
 
-        {/* Catégorie */}
+        {/* Category */}
         <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider">
           {product.category}
         </span>
 
-        {/* Titre */}
+        {/* Title */}
         <Link href={`/product/${product.id}`} className="block mt-1">
           <h3 className="font-bold text-slate-900 text-base hover:text-blue-600 transition-colors line-clamp-1">
             {product.title}
@@ -96,7 +96,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </p>
       </div>
 
-      {/* Prix & Bouton Ajout Panier */}
+      {/* price and add to cart button */}
       <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
         <div>
           <span className="text-[10px] text-slate-400 block uppercase font-medium">Price</span>

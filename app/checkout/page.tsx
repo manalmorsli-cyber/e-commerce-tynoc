@@ -16,7 +16,7 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  // État du formulaire
+  // Formuler state
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -24,13 +24,12 @@ export default function CheckoutPage() {
     address: '',
   });
 
-  // État des erreurs
+  // error handeling
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     setIsMounted(true);
 
-    // Pré-remplir le formulaire si l'utilisateur est connecté
     if (user) {
       setFormData((prev) => ({
         ...prev,
@@ -78,7 +77,6 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      // Sauvegarde dans DynamoDB via l'API /api/orders
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,7 +92,6 @@ export default function CheckoutPage() {
         setIsSubmitted(true);
         if (clearCart) clearCart();
       } else {
-        // En cas de secours/démo, on confirme l'affichage
         setIsSubmitted(true);
         if (clearCart) clearCart();
       }
@@ -139,7 +136,6 @@ export default function CheckoutPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Formulaire de livraison avec validation */}
               <form onSubmit={handleSubmit} className="md:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
                 <h2 className="text-base font-bold text-slate-900 mb-2">Shipping Details</h2>
                 
@@ -152,7 +148,7 @@ export default function CheckoutPage() {
                       value={formData.firstName}
                       onChange={handleChange}
                       placeholder="John"
-                      className={`w-full px-3 py-2 text-xs border ${errors.firstName ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
+                      className={`w-full px-3 py-2 text-xs text-slate-900 font-medium placeholder:text-slate-400 border ${errors.firstName ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
                     />
                     {errors.firstName && <span className="text-[10px] text-red-500 mt-1 block">{errors.firstName}</span>}
                   </div>
@@ -165,7 +161,7 @@ export default function CheckoutPage() {
                       value={formData.lastName}
                       onChange={handleChange}
                       placeholder="Doe"
-                      className={`w-full px-3 py-2 text-xs border ${errors.lastName ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
+                      className={`w-full px-3 py-2 text-xs text-slate-900 font-medium placeholder:text-slate-400 border ${errors.lastName ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
                     />
                     {errors.lastName && <span className="text-[10px] text-red-500 mt-1 block">{errors.lastName}</span>}
                   </div>
@@ -179,7 +175,7 @@ export default function CheckoutPage() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="john@example.com"
-                    className={`w-full px-3 py-2 text-xs border ${errors.email ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
+                    className={`w-full px-3 py-2 text-xs text-slate-900 font-medium placeholder:text-slate-400 border ${errors.email ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
                   />
                   {errors.email && <span className="text-[10px] text-red-500 mt-1 block">{errors.email}</span>}
                 </div>
@@ -192,7 +188,7 @@ export default function CheckoutPage() {
                     value={formData.address}
                     onChange={handleChange}
                     placeholder="123 Main Street"
-                    className={`w-full px-3 py-2 text-xs border ${errors.address ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
+                    className={`w-full px-3 py-2 text-xs text-slate-900 font-medium placeholder:text-slate-400 border ${errors.address ? 'border-red-500' : 'border-slate-200'} rounded-xl outline-none focus:border-blue-600 bg-slate-50`}
                   />
                   {errors.address && <span className="text-[10px] text-red-500 mt-1 block">{errors.address}</span>}
                 </div>
@@ -206,7 +202,6 @@ export default function CheckoutPage() {
                 </button>
               </form>
 
-              {/* Résumé de la commande */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm h-fit space-y-4">
                 <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">
                   Order Summary

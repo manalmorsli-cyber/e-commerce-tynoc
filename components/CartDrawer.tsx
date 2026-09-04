@@ -18,18 +18,18 @@ export default function CartDrawer() {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Fond Sombre */}
+      {/* dark font */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
         onClick={() => setIsCartOpen(false)}
       />
 
-      {/* Tiroir Panier */}
+      {/* cart */}
       <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between z-10 p-6 overflow-y-auto">
         
         <div>
           <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-            <h2 className="text-xl font-black text-slate-900">Mon Panier</h2>
+            <h2 className="text-xl font-black text-slate-900">My cart</h2>
             <button
               onClick={() => setIsCartOpen(false)}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold transition-colors cursor-pointer"
@@ -96,7 +96,7 @@ export default function CartDrawer() {
                       onClick={() => removeFromCart(itemId)}
                       className="text-xs font-bold text-rose-500 hover:text-rose-700 transition-colors shrink-0 cursor-pointer"
                     >
-                      Supprimer
+                      Delete
                     </button>
                   </div>
                 );
@@ -119,7 +119,7 @@ export default function CartDrawer() {
               onClick={() => setIsCartOpen(false)}
               className="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-center text-xs shadow-lg shadow-blue-600/20 transition-all cursor-pointer"
             >
-              Commander ({cartCount})
+              Shop ({cartCount})
             </Link>
           </div>
         )}
