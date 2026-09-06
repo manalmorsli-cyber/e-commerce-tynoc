@@ -2,9 +2,9 @@
 
 import { db } from '@/lib/dynamodb';
 import { ScanCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
-import { Product } from '@/context/CartContext';
+import { Product } from '@/types';
 
-// Récupérer tous les produits
+// All products
 export async function getProducts(): Promise<Product[]> {
   try {
     const command = new ScanCommand({
@@ -18,7 +18,7 @@ export async function getProducts(): Promise<Product[]> {
   }
 }
 
-// Récupérer un produit par son ID
+// Product by ID
 export async function getProductById(id: string): Promise<Product | null> {
   try {
     const command = new GetCommand({

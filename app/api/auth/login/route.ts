@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    // 1. Validate incoming data
+    //Validate incoming data
     if (!email || !password) {
       return NextResponse.json(
         { error: 'Email and password are required' },
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Search for the user in the DynamoDB table
+    //Search for the user in the DynamoDB table
     const data = await db.send(
       new ScanCommand({
         TableName: TABLE_NAME,
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     const user = data.Items && data.Items[0];
 
-    // 3. Handle user not found
+    //Handle user not found
     if (!user) {
       return NextResponse.json(
         { error: 'No account found with this email. Please sign up first.' },
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Verify password matches
+    //Verify password matches
     if (user.password !== password) {
       return NextResponse.json(
         { error: 'Incorrect password. Please try again.' },
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 5. Remove password from the response object for security
+    //Remove password from the response object for security
     const { password: _, ...userWithoutPassword } = user;
     
     return NextResponse.json({ success: true, user: userWithoutPassword }, { status: 200 });

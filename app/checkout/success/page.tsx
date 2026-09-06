@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -19,13 +20,15 @@ function SuccessContent() {
       <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider">
         Order Confirmed
       </span>
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-4 mb-2">Thank you for your order!</h1>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-4 mb-2">
+        Thank you for your order!
+      </h1>
       <p className="text-gray-500 text-sm mb-6">
         We have received your order <span className="font-bold text-gray-800">#{orderId}</span> and are getting it ready.
       </p>
       <Link
         href="/"
-        className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-xl transition-colors shadow-sm"
+        className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-xl transition-colors shadow-sm text-xs"
       >
         Continue Shopping
       </Link>
@@ -35,13 +38,14 @@ function SuccessContent() {
 
 export default function SuccessPage() {
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col">
-      <Navbar />
+    <div className="min-h-screen bg-gray-50/50 flex flex-col justify-between">
+      <Navbar showSearch={false} />
       <main className="max-w-7xl mx-auto px-4 py-10 flex-1 w-full">
-        <Suspense fallback={<div className="text-center py-20">Loading order details...</div>}>
+        <Suspense fallback={<div className="text-center py-20 text-xs text-slate-500">Loading order details...</div>}>
           <SuccessContent />
         </Suspense>
       </main>
+      <Footer />
     </div>
   );
 }

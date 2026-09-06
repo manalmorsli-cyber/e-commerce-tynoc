@@ -18,7 +18,6 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic frontend validation
     if (!email.trim() || !password.trim()) {
       setError('Please fill in all fields.');
       return;
@@ -28,7 +27,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Call the login API route
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,10 +39,8 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to login');
       }
 
-      // 2. Update global authentication state
       login(data.user);
       
-      // 3. Redirect user to the homepage
       router.push('/');
     } catch (err: any) {
       setError(err.message);

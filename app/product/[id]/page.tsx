@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -28,9 +28,12 @@ export default function ProductDetailPage() {
         if (res.ok) {
           const data: Product = await res.json();
           setProduct(data);
+        } else {
+          setProduct(null);
         }
       } catch (error) {
         console.error('Error loading product:', error);
+        setProduct(null);
       } finally {
         setIsLoading(false);
       }
@@ -45,6 +48,7 @@ export default function ProductDetailPage() {
     ? wishlist.some((item: Product) => String(item.id) === String(product.id))
     : false;
 
+  // Render loading spinner while fetching product data
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
@@ -57,23 +61,9 @@ export default function ProductDetailPage() {
     );
   }
 
+  // Trigger Next.js global 404 page if product is not found
   if (!product) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
-        <Navbar showSearch={false} />
-        <main className="max-w-7xl mx-auto px-4 py-20 text-center flex-grow">
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Product Not Found</h1>
-          <p className="text-slate-500 text-sm mb-6">The requested product does not exist.</p>
-          <Link
-            href="/"
-            className="inline-block bg-blue-600 text-white font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-blue-500 transition-colors"
-          >
-            Back to Home
-          </Link>
-        </main>
-        <Footer />
-      </div>
-    );
+    notFound();
   }
 
   const productImages: string[] =

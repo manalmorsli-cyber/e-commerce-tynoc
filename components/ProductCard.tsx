@@ -2,24 +2,18 @@
 
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  badge?: string;
-  image: string;
-  rating: number;
-  stock?: number;
-}
+import { Product } from '@/types';
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart, toggleWishlist, wishlist = [] } = useCart();
   
-  // verify product in wishlist
-  const isFavorite = wishlist.some((item: any) => item.id === product.id);
+  const isFavorite = wishlist.some((item: Product) => String(item.id) === String(product.id));
+
+  // Fallback to the first element in images array if available or use product.image
+  const displayImage =
+    Array.isArray(product.images) && product.images.length > 0
+      ? product.images[0]
+      : product.image;
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -38,7 +32,6 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="bg-white rounded-3xl border border-slate-200/80 p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all relative group">
       <div>
-        {/* Container Image */}
         <div className="relative w-full h-48 mb-4 rounded-2xl overflow-hidden bg-slate-100">
           {product.badge && (
             <span className="absolute top-3 left-3 z-10 bg-blue-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
@@ -46,7 +39,6 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
 
-          {/* wishlist button */}
           <button
             type="button"
             onClick={handleFavoriteClick}
@@ -71,32 +63,29 @@ export default function ProductCard({ product }: { product: Product }) {
             </svg>
           </button>
 
+          {/* Render resolved display image */}
           <img
-            src={product.image}
+            src={displayImage}
             alt={product.title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
 
-        {/* Category */}
         <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider">
           {product.category}
         </span>
 
-        {/* Title */}
         <Link href={`/product/${product.id}`} className="block mt-1">
           <h3 className="font-bold text-slate-900 text-base hover:text-blue-600 transition-colors line-clamp-1">
             {product.title}
           </h3>
         </Link>
 
-        {/* Description */}
         <p className="text-xs text-slate-500 mt-1 line-clamp-2">
           {product.description}
         </p>
       </div>
 
-      {/* price and add to cart button */}
       <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
         <div>
           <span className="text-[10px] text-slate-400 block uppercase font-medium">Price</span>

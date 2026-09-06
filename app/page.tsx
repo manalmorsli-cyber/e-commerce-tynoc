@@ -15,17 +15,20 @@ const ProductCarousel = dynamic(() => import('@/components/ProductCarousel'), {
   ssr: false,
 });
 
-const flashSaleProducts: Product[] = [
-  {
-    id: 'flash-1',
-    title: 'Limited Edition Earbuds',
-    description: 'Ultra-low latency audio with active noise cancellation.',
-    price: 119,
-    category: 'Electronics',
-    image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&q=80',
-    rating: { rate: 4.9, count: 128 },
-  }
-];
+
+const ProductSkeleton = () => (
+  <div className="bg-white rounded-2xl border border-slate-200/80 p-4 w-full h-[320px] flex flex-col justify-between animate-pulse shadow-sm">
+    <div className="h-40 bg-slate-100 rounded-xl mb-4 w-full"></div>
+    <div className="space-y-3">
+      <div className="h-3 bg-slate-100 rounded-full w-1/4"></div>
+      <div className="h-4 bg-slate-100 rounded-full w-3/4"></div>
+    </div>
+    <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-50">
+      <div className="h-6 bg-slate-100 rounded-full w-1/3"></div>
+      <div className="h-8 bg-slate-100 rounded-lg w-1/4"></div>
+    </div>
+  </div>
+);
 
 export default function HomePage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -73,6 +76,7 @@ export default function HomePage() {
     return null;
   }
 
+  // Filter products based on search query and category selection
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -84,6 +88,10 @@ export default function HomePage() {
   });
 
   const isFiltering = searchQuery.trim() !== '' || selectedCategory !== 'All';
+
+  // Select items with badges for Flash Deals section or fallback to first 4 items
+  const badgedProducts = products.filter((product) => product.badge);
+  const flashSaleProducts = badgedProducts.length > 0 ? badgedProducts.slice(0, 4) : products.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
@@ -108,8 +116,8 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-
-          {!isFiltering && (
+          
+          {!isFiltering && flashSaleProducts.length > 0 && (
             
 
 <ProductCarousel products={flashSaleProducts} title="🔥 Limited Time Flash Deals" />
@@ -155,17 +163,28 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Skeleton Loading State */}
             {isLoading ? (
-              <div className="py-16 text-center text-slate-500">
-                <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-blue-600 rounded-full mb-4" role="status">
-                  <span className="sr-only">Loading...</span>
-                </div>
-                <p className="text-sm font-medium">Fetching products from DynamoDB Local...</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <ProductSkeleton key={`skeleton-${i}`} />
+                ))}
               </div>
             ) : filteredProducts.length === 0 ? (
-              <div className="py-16 text-center text-slate-500 bg-white rounded-2xl border border-slate-200">
-                <p className="text-base font-semibold text-slate-700">No products found</p>
-                <p className="text-xs text-slate-400 mt-1">Try adjusting your search query or category filter.</p>
+              <div className="py-16 text-center bg-white rounded-3xl border border-slate-200/80 shadow-sm flex flex-col items-center justify-center max-w-2xl mx-auto mt-8">
+                <div className="w-16 h-16 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mb-4 text-2xl border border-slate-100">
+                  🔍
+                </div>
+                <p className="text-lg font-bold text-slate-900">No products found</p>
+                <p className="text-xs text-slate-500 mt-2 max-w-sm">
+                  We couldn't find any products matching your current filters. Try adjusting your search query or category.
+                </p>
+                <button 
+                  onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
+                  className="mt-6 text-xs font-bold text-blue-600 bg-blue-50 px-5 py-2.5 rounded-xl hover:bg-blue-100 transition-colors"
+                >
+                  Clear Filters
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

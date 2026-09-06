@@ -1,56 +1,70 @@
 export interface Product {
   id: string;
   title: string;
-  description: string;
   price: number;
+  description: string;
   category: string;
   image: string;
   badge?: string;
-  rating: number;
-  reviews: number;
+  rating?: number;
 }
 
 export const mockProducts: Product[] = [
   {
     id: '1',
-    title: 'Pro Wireless Headphones',
-    description: 'Active noise cancellation, 30-hour battery life, and premium spatial sound quality.',
+    title: 'Wireless Noise-Canceling Headphones',
     price: 199.99,
+    description: 'High-fidelity audio with active noise cancellation and 30-hour battery life.',
     category: 'Electronics',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
-    badge: 'Best Seller',
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
+    badge: 'Bestseller',
     rating: 4.8,
-    reviews: 120,
   },
   {
     id: '2',
-    title: 'Smart Fitness Watch',
-    description: 'Heart rate tracking, built-in GPS, active sleep monitoring, and water-resistant up to 50m.',
-    price: 149.50,
-    category: 'Electronics',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
-    badge: 'Speed Edition',
-    rating: 4.5,
-    reviews: 85,
+    title: 'Minimalist Mechanical Keyboard',
+    price: 129.50,
+    description: 'Compact 75% layout with tactile switches and customizable RGB backlighting.',
+    category: 'Accessories',
+    image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80',
+    badge: 'New',
+    rating: 4.7,
   },
   {
     id: '3',
-    title: 'Ergonomic Laptop Backpack',
-    description: 'Smart storage, 15-inch padded laptop compartment, and durable water-resistant fabric.',
-    price: 79.00,
+    title: 'Ergonomic Wireless Mouse',
+    price: 79.99,
+    description: 'Designed for comfort with precision tracking and multi-device connectivity.',
     category: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80',
-    rating: 4.6,
-    reviews: 64,
+    image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800&q=80',
+    rating: 4.5,
   },
   {
     id: '4',
-    title: 'Minimalist Desk Mat',
-    description: 'Premium vegan leather desk pad, waterproof surface, and anti-slip rubber base.',
-    price: 35.00,
-    category: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&auto=format&fit=crop&q=80',
+    title: 'Ultra-Wide Curved Gaming Monitor',
+    price: 499.00,
+    description: '34-inch QHD display with 144Hz refresh rate for immersive viewing.',
+    category: 'Electronics',
+    image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&q=80',
+    badge: 'Sale',
     rating: 4.9,
-    reviews: 210,
+  },
+  {
+    id: '5',
+    title: 'Smart Fitness Watch',
+    price: 149.95,
+    description: 'Track your workouts, heart rate, and sleep with built-in GPS.',
+    category: 'Wearables',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
+    rating: 4.6,
+  },
+  {
+    id: '6',
+    title: 'Leather Desk Mat',
+    price: 39.99,
+    description: 'Premium PU leather mat protecting your desk while elevating your setup.',
+    category: 'Accessories',
+    image: 'https://images.unsplash.com/photo-1616410011236-7a42121dd981?w=800&q=80',
+    rating: 4.4,
   },
 ];

@@ -18,7 +18,6 @@ export async function GET(
   props: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    // Résolution asynchrone de params pour Next.js 15
     const resolvedParams = await props.params;
     const id = resolvedParams?.id;
 

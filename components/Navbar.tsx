@@ -24,7 +24,7 @@ export default function Navbar({
 }: NavbarProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
-  const { cart = [], wishlist = [], setIsCartOpen } = useCart();
+  const { cart = [], wishlist = [] } = useCart();
   const { user, logout } = useAuth();
 
   useEffect(() => {
@@ -47,11 +47,6 @@ export default function Navbar({
 
   const cartCount = cart.reduce((sum: number, item: CartItem) => sum + (item.quantity || 1), 0);
 
-  const handleOpenCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsCartOpen(true);
-  };
-
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-0 md:h-20 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-6">
@@ -61,19 +56,21 @@ export default function Navbar({
             <Logo variant="light" />
           </Link>
 
+          {/* Mobile Actions */}
           <div className="flex items-center gap-2 md:hidden">
             <Link href="/wishlist" className="p-2 text-rose-500 font-bold text-sm">
               ♥ <span className="text-xs">({isMounted ? wishlist.length : 0})</span>
             </Link>
-            <button
-              onClick={handleOpenCart}
+            <Link
+              href="/cart"
               className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer"
             >
               🛒 {isMounted ? cartCount : 0}
-            </button>
+            </Link>
           </div>
         </div>
 
+        {/* Search Bar */}
         {showSearch && (
           <div className="w-full md:flex-1 md:max-w-xl">
             <div className="flex items-center rounded-xl border border-slate-300 bg-slate-50 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/20 overflow-hidden transition-all h-10">
@@ -105,6 +102,7 @@ export default function Navbar({
           </div>
         )}
 
+        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-4 shrink-0">
           <Link href="/" className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">
             Home
@@ -129,8 +127,8 @@ export default function Navbar({
             )}
           </Link>
 
-          <button
-            onClick={handleOpenCart}
+          <Link
+            href="/cart"
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md shadow-blue-600/20 cursor-pointer"
           >
             <span>🛒</span>
@@ -138,7 +136,7 @@ export default function Navbar({
             <span className="bg-white/20 text-white px-2 py-0.5 rounded-md text-[10px] font-black">
               {isMounted ? cartCount : 0}
             </span>
-          </button>
+          </Link>
 
           {isMounted && user ? (
             <div className="flex items-center gap-2 pl-2 border-l border-slate-200">

@@ -22,7 +22,7 @@ export default function CartPage() {
       <Navbar showSearch={false} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 flex-grow w-full">
-        {/* Header panier */}
+        {/* Cart Header */}
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             Shopping Cart
@@ -54,7 +54,7 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
-            {/* Liste des produits (Mobile 1 col / PC 8 cols) */}
+            {/* Product List */}
             <div className="lg:col-span-8 space-y-3 sm:space-y-4">
               {cart.map((item: any, index: number) => {
                 const title = item.title || item.name || 'Product';
@@ -67,7 +67,7 @@ export default function CartPage() {
                     key={`cart-item-${itemId}-${index}`}
                     className="bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 shadow-sm"
                   >
-                    {/* Information Produit + Image cadrée */}
+                    {/* Product Information & Image */}
                     <div className="flex items-center gap-3.5 sm:gap-4 flex-1 min-w-0">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
                         <img
@@ -86,12 +86,12 @@ export default function CartPage() {
                       </div>
                     </div>
 
-                    {/* Quantité & Prix & Bouton Supprimer */}
+                    {/* Quantity Controls, Price & Remove Button */}
                     <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                      {/* Control quantite */}
+                      {/* Quantity Controls */}
                       <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
                         <button
-                          onClick={() => updateQuantity(itemId, -1)}
+                          onClick={() => updateQuantity(itemId, Math.max(1, quantity - 1))}
                           className="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 font-bold transition-colors text-xs cursor-pointer"
                         >
                           -
@@ -100,19 +100,19 @@ export default function CartPage() {
                           {quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(itemId, 1)}
+                          onClick={() => updateQuantity(itemId, quantity + 1)}
                           className="w-8 h-8 flex items-center justify-center text-slate-600 hover:bg-slate-200 font-bold transition-colors text-xs cursor-pointer"
                         >
                           +
                         </button>
                       </div>
 
-                      {/* Sous total */}
+                      {/* Subtotal */}
                       <span className="font-black text-slate-900 text-sm sm:text-base min-w-[65px] text-right">
                         ${(price * quantity).toFixed(2)}
                       </span>
 
-                      {/* Bouton X */}
+                      {/* Remove Button */}
                       <button
                         onClick={() => removeFromCart(itemId)}
                         className="text-slate-400 hover:text-rose-600 transition-colors text-sm font-bold p-1 cursor-pointer"
@@ -126,7 +126,7 @@ export default function CartPage() {
               })}
             </div>
 
-            {/* Total / Order Summary (PC 4 cols / Mobile 1 col) */}
+            {/* Order Summary*/}
             <div className="lg:col-span-4 sticky top-24">
               <div className="bg-white rounded-3xl border border-slate-200/80 p-5 sm:p-6 shadow-sm space-y-4">
                 <h2 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-3">
@@ -149,7 +149,7 @@ export default function CartPage() {
                   <span>${total.toFixed(2)}</span>
                 </div>
 
-                {/* BOUTON PROCEED TO CHECKOUT REDIRIGE VERS /checkout */}
+                {/* Redirects to Checkout Page */}
                 <Link href="/checkout" className="block w-full pt-2">
                   <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl text-xs transition-all shadow-lg shadow-blue-600/20 cursor-pointer text-center">
                     Proceed to Checkout

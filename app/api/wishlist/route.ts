@@ -4,7 +4,6 @@ import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 
 const TABLE_NAME = 'Wishlists';
 
-// Fetch the user's wishlist from DynamoDB
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -28,7 +27,6 @@ export async function GET(request: Request) {
   }
 }
 
-// Update the user's wishlist in DynamoDB
 export async function POST(request: Request) {
   try {
     const { userId, items } = await request.json();

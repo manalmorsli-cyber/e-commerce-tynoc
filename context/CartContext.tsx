@@ -10,7 +10,7 @@ interface CartContextType {
   wishlist: Product[];
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
-  addToCart: (product: Product | (CartItem & Product)) => void;
+  addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   toggleWishlist: (product: Product) => void;
@@ -39,11 +39,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             fetch(`/api/wishlist?userId=${user.id}`),
           ]);
 
-          const cartData = await cartRes.json();
-          const wishlistData = await wishlistRes.json();
-
-          if (cartRes.ok) setCart(cartData.items || []);
-          if (wishlistRes.ok) setWishlist(wishlistData.items || []);
+          if (cartRes.ok) {
+            const cartData = await cartRes.json();
+            setCart(cartData.items || []);
+          }
+          if (wishlistRes.ok) {
+            const wishlistData = await wishlistRes.json();
+            setWishlist(wishlistData.items || []);
+          }
         } catch (e) {
           console.error('Error fetching user data:', e);
         }
@@ -51,8 +54,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const savedGuestCart = localStorage.getItem('tynoc_guest_cart');
         const savedGuestWishlist = localStorage.getItem('tynoc_guest_wishlist');
 
-        setCart(savedGuestCart ? JSON.parse(savedGuestCart) : []);
-        setWishlist(savedGuestWishlist ? JSON.parse(savedGuestWishlist) : []);
+        if (savedGuestCart) {
+          try {
+            setCart(JSON.parse(savedGuestCart));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+        if (savedGuestWishlist) {
+          try {
+            setWishlist(JSON.parse(savedGuestWishlist));
+          } catch (e) {
+            console.error(e);
+          }
+        }
       }
     };
 
@@ -95,13 +110,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addToCart = (product: Product | any) => {
+  const addToCart = (product: Product) => {
     const existing = cart.find((item) => String(item.id) === String(product.id));
     let updatedCart: CartItem[];
 
     if (existing) {
       updatedCart = cart.map((item) =>
-        String(item.id) === String(product.id) ? { ...item, quantity: item.quantity + 1 } : item
+        String(item.id) === String(product.id)
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
       );
     } else {
       const newItem: CartItem = {
@@ -109,7 +126,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         title: product.title,
         price: Number(product.price),
         image: product.image,
-        quantity: product.quantity || 1,
+        quantity: 1,
         category: product.category,
       };
       updatedCart = [...cart, newItem];
@@ -128,7 +145,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeFromCart(productId);
     } else {
       syncCart(
-        cart.map((item) => (String(item.id) === String(productId) ? { ...item, quantity } : item))
+        cart.map((item) =>
+          String(item.id) === String(productId) ? { ...item, quantity } : item
+        )
       );
     }
   };

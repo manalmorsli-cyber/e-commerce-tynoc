@@ -7,7 +7,6 @@ const TABLE_NAME = 'Carts';
 // Get the user's cart
 export async function GET(request: Request) {
   try {
-    // Extract userId from the URL query parameters (e.g., /api/cart?userId=123)
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 
@@ -23,7 +22,6 @@ export async function GET(request: Request) {
       })
     );
 
-    // Return the items or an empty array if the cart doesn't exist yet
     return NextResponse.json({ items: data.Item?.items || [] }, { status: 200 });
   } catch (error: any) {
     console.error('Failed to fetch cart:', error);
@@ -31,7 +29,7 @@ export async function GET(request: Request) {
   }
 }
 
-// Update the user's cart (Add, Update quantity, Remove)
+// Update the user's cart 
 export async function POST(request: Request) {
   try {
     const { userId, items } = await request.json();

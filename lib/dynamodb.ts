@@ -4,13 +4,16 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 const region = process.env.AWS_REGION || 'us-east-1';
 const endpoint = process.env.DYNAMODB_ENDPOINT;
 
+// Real keys for prod or fake ones for DynamoDB local
+const accessKeyId = process.env.AWS_ACCESS_KEY_ID || (endpoint ? 'fakeAccessKeyId' : '');
+const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY || (endpoint ? 'fakeSecretAccessKey' : '');
+
 const client = new DynamoDBClient({
   region,
-  endpoint: endpoint || undefined,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'fakeAccessKeyId',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'fakeSecretAccessKey',
-  },
+  ...(endpoint ? { endpoint } : {}),
+  ...(accessKeyId && secretAccessKey
+    ? { credentials: { accessKeyId, secretAccessKey } }
+    : {}),
 });
 
 export const db = DynamoDBDocumentClient.from(client);

@@ -22,7 +22,6 @@ export default function RelatedProducts({ currentProductId, category }: RelatedP
         if (res.ok) {
           const allProducts: Product[] = await res.json();
 
-          // Strict case-insensitive category match and exclusion of current item
           const filtered = allProducts.filter((p) => {
             const matchesCategory =
               p.category &&
