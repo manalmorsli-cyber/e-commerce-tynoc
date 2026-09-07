@@ -75,8 +75,9 @@ Database Abstraction Layer (lib/dynamodb.ts)
        │
        ▼
 AWS DynamoDB (Cloud Instance or Local Endpoint)
-Project Structure
-Plaintext
+
+## Project Structure
+
 e-commerce-tynoc/
 ├── app/                            # Next.js App Router (Pages & REST API)
 │   ├── api/                        # Backend REST API endpoints (auth, cart, products, orders...)
@@ -92,6 +93,7 @@ e-commerce-tynoc/
 ├── types/                          # TypeScript type definitions
 ├── .env.local                      # Environment variables
 └── README.md                       # Project documentation
+
 Database Design (AWS DynamoDB)
 The database architecture is designed with NoSQL best practices using AWS DynamoDB:
 
@@ -132,7 +134,6 @@ DELETE: Cart and wishlist items removed upon user action.
 Environment Variables
 Create a .env.local file in the root directory and configure the following credentials:
 
-Extrait de code
 # AWS DynamoDB Configuration
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your_access_key_id
@@ -147,7 +148,9 @@ DYNAMODB_CATEGORIES_TABLE=Categories
 DYNAMODB_USERS_TABLE=Users
 DYNAMODB_CART_TABLE=Carts
 DYNAMODB_WISHLIST_TABLE=Wishlists
-Getting Started
+
+
+## Getting Started
 Prerequisites
 Node.js (v18.x or later)
 
@@ -156,17 +159,16 @@ npm or yarn
 Installation
 Clone the repository:
 
-Bash
 git clone [https://github.com/manalmorsli-cyber/e-commerce-tynoc.git](https://github.com/manalmorsli-cyber/e-commerce-tynoc.git)
 cd e-commerce-tynoc
+
 Install project dependencies:
-
-Bash
 npm install
-Run the development server:
 
-Bash
+Run the development server:
 npm run dev
+
 Open http://localhost:3000 in your browser to view the application.
 
 Screenshots
+
