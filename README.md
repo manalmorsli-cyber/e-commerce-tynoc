@@ -169,4 +169,14 @@ Bash
 npm run dev
 Open http://localhost:3000 in your browser to view the application.
 
-Screenshots
+## Screenshots
+### Home page: <img width="1893" height="821" alt="image" src="https://github.com/user-attachments/assets/ae244811-bc9a-4f30-a11b-c038b42b4697" />
+### Product Grid : <img width="1674" height="798" alt="image" src="https://github.com/user-attachments/assets/63c38cfd-286f-4f2c-9c63-4068d27532c8" />
+### Product Details & Mobile View : <img width="1483" height="769" alt="image" src="https://github.com/user-attachments/assets/1e544df4-d6ec-4243-abf6-13bc930310c2" />
+<img width="412" height="824" alt="image" src="https://github.com/user-attachments/assets/4f20504f-f38f-484a-992f-b130f4799e49" />
+
+
+
+
+
+
