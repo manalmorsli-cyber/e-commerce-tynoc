@@ -98,7 +98,7 @@ e-commerce-tynoc/
 
 ---
 
-## 🗄️ Database Design (AWS DynamoDB)
+## Database Design (AWS DynamoDB)
 
 The database architecture is designed with NoSQL best practices using AWS DynamoDB:
 
