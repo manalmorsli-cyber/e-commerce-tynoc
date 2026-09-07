@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import RelatedProducts from '@/components/RelatedProducts';
 import { useCart } from '@/context/CartContext';
 import { Product } from '@/types';
+import { mockProducts } from '@/data/products';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -29,11 +30,15 @@ export default function ProductDetailPage() {
           const data: Product = await res.json();
           setProduct(data);
         } else {
-          setProduct(null);
+          // Fallback to local mock products if API responds with an error
+          const fallback = mockProducts.find((item) => String(item.id) === String(id));
+          setProduct(fallback || null);
         }
       } catch (error) {
-        console.error('Error loading product:', error);
-        setProduct(null);
+        console.error('API fetch failed, reading from mock products:', error);
+        // Fallback to local mock products if offline or API route fails
+        const fallback = mockProducts.find((item) => String(item.id) === String(id));
+        setProduct(fallback || null);
       } finally {
         setIsLoading(false);
       }
@@ -48,7 +53,6 @@ export default function ProductDetailPage() {
     ? wishlist.some((item: Product) => String(item.id) === String(product.id))
     : false;
 
-  // Render loading spinner while fetching product data
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
@@ -61,7 +65,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  // Trigger Next.js global 404 page if product is not found
   if (!product) {
     notFound();
   }

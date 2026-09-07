@@ -63,18 +63,21 @@ export default function ProductCard({ product }: { product: Product }) {
             </svg>
           </button>
 
-          {/* Render resolved display image */}
-          <img
-            src={displayImage}
-            alt={product.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
+          {/* Singular route match: '/product/[id]' */}
+          <Link href={`/product/${product.id}`} className="block w-full h-full">
+            <img
+              src={displayImage}
+              alt={product.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </Link>
         </div>
 
         <span className="text-[11px] font-semibold text-blue-600 uppercase tracking-wider">
           {product.category}
         </span>
 
+        {/* Singular route match: '/product/[id]' */}
         <Link href={`/product/${product.id}`} className="block mt-1">
           <h3 className="font-bold text-slate-900 text-base hover:text-blue-600 transition-colors line-clamp-1">
             {product.title}
