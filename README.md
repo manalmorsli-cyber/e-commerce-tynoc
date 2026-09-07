@@ -7,8 +7,7 @@ A production-grade, full-stack e-commerce web application designed and developed
 ## Project Links
 
 * **GitHub Repository**: [https://github.com/manalmorsli-cyber/e-commerce-tynoc](https://github.com/manalmorsli-cyber/e-commerce-tynoc)
-* **Live Deployment (Vercel)**: [https://e-commerce-tynoc.vercel.app](https://e-commerce-tynoc.vercel.app) *(Replace with your exact Vercel link if different)*
-
+* **Live Deployment (Vercel)**: [https://e-commerce-tynoc.vercel.app](https://e-commerce-tynoc.vercel.app) 
 ---
 
 ## Project Overview
