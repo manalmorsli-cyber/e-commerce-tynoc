@@ -58,6 +58,25 @@ export default function Navbar({
 
           {/* Mobile Actions */}
           <div className="flex items-center gap-2 md:hidden">
+            {isMounted && user ? (
+              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200">
+                <span>👤 {user.name.split(' ')[0]}</span>
+                <button
+                  onClick={logout}
+                  className="text-[10px] text-red-500 font-semibold ml-1 cursor-pointer"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="text-xs font-bold text-blue-600 border border-blue-600/30 hover:bg-blue-50 px-2.5 py-1.5 rounded-xl transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
+
             <Link href="/wishlist" className="p-2 text-rose-500 font-bold text-sm">
               ♥ <span className="text-xs">({isMounted ? wishlist.length : 0})</span>
             </Link>
@@ -81,7 +100,7 @@ export default function Navbar({
               >
                 <option value="All">All Categories</option>
                 {dbCategories.map((cat) => (
-                  <option key={cat.id} value={cat.name}>
+                  <option key={cat.id || cat.name} value={cat.name}>
                     {cat.name}
                   </option>
                 ))}

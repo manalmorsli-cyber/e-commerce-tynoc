@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { mockProducts } from '@/data/products';
 
 const client = new DynamoDBClient({
   region: process.env.AWS_REGION || 'us-east-1',
@@ -13,19 +14,33 @@ const client = new DynamoDBClient({
 
 const db = DynamoDBDocumentClient.from(client);
 
+// Fallback categories dynamically extracted from mock products
+const fallbackCategories = Array.from(
+  new Set(mockProducts.map((product) => product.category).filter(Boolean))
+).map((categoryName, index) => ({
+  id: `cat-${index + 1}`,
+  name: categoryName,
+}));
+
 export async function GET() {
   try {
     const response = await db.send(
       new ScanCommand({
-        TableName: 'Categories',
+        TableName: process.env.DYNAMODB_CATEGORIES_TABLE || 'Categories',
       })
     );
-    return NextResponse.json(response.Items || [], { status: 200 });
+
+    if (response.Items && response.Items.length > 0) {
+      const categories = response.Items.map((item, idx) => ({
+        id: item.id || `db-cat-${idx}`,
+        name: item.name || item.category || 'Uncategorized',
+      }));
+      return NextResponse.json(categories, { status: 200 });
+    }
+
+    return NextResponse.json(fallbackCategories, { status: 200 });
   } catch (error: any) {
-    console.error('Error fetching categories:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch categories' },
-      { status: 500 }
-    );
+    console.error('Error fetching categories from DynamoDB, serving mock categories:', error);
+    return NextResponse.json(fallbackCategories, { status: 200 });
   }
 }
