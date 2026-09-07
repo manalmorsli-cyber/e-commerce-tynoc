@@ -6,8 +6,9 @@ A production-grade, full-stack e-commerce web application designed and developed
 
 ## Project Links
 
-* **GitHub Repository**: [https://github.com/manalmorsli-cyber/e-commerce-tynoc](https://github.com/manalmorsli-cyber/e-commerce-tynoc)
-* **Live Deployment (Vercel)**: [https://e-commerce-tynoc.vercel.app](https://e-commerce-tynoc.vercel.app) 
+* **GitHub Repository**: https://github.com/manalmorsli-cyber/e-commerce-tynoc
+* **Live Deployment (Vercel)**: https://e-commerce-tynoc.vercel.app 
+
 ---
 
 ## Project Overview
@@ -74,11 +75,8 @@ Database Abstraction Layer (lib/dynamodb.ts)
        │
        ▼
 AWS DynamoDB (Cloud Instance or Local Endpoint)
-
----
-
-## Project Structure
-
+Project Structure
+Plaintext
 e-commerce-tynoc/
 ├── app/                            # Next.js App Router (Pages & REST API)
 │   ├── api/                        # Backend REST API endpoints (auth, cart, products, orders...)
@@ -94,46 +92,47 @@ e-commerce-tynoc/
 ├── types/                          # TypeScript type definitions
 ├── .env.local                      # Environment variables
 └── README.md                       # Project documentation
-
----
-
-## Database Design (AWS DynamoDB)
-
+Database Design (AWS DynamoDB)
 The database architecture is designed with NoSQL best practices using AWS DynamoDB:
 
-### 1. Products Table (`Products`)
-* **Partition Key**: `id` (String)
-* **Attributes**: `title` (String), `price` (Number), `description` (String), `category` (String), `image` (String), `images` (List), `badge` (String), `inStock` (Boolean)
+1. Products Table (Products)
+Partition Key: id (String)
 
-### 2. Categories Table (`Categories`)
-* **Partition Key**: `id` (String)
-* **Attributes**: `name` (String), `slug` (String), `icon` (String)
+Attributes: title (String), price (Number), description (String), category (String), image (String), images (List), badge (String), inStock (Boolean)
 
-### 3. Users Table (`Users`)
-* **Partition Key**: `id` (String)
-* **Attributes**: `email` (String), `name` (String), `password` (String), `createdAt` (String)
+2. Categories Table (Categories)
+Partition Key: id (String)
 
-### 4. Shopping Cart Table (`Carts`)
-* **Partition Key**: `userId` (String)
-* **Attributes**: `items` (List of Objects: `{ productId, quantity, price }`), `updatedAt` (String)
+Attributes: name (String), slug (String), icon (String)
 
-### 5. Wishlist Table (`Wishlists`)
-* **Partition Key**: `userId` (String)
-* **Attributes**: `productIds` (List of Strings), `updatedAt` (String)
+3. Users Table (Users)
+Partition Key: id (String)
 
-### Data Operations (CRUD Breakdown)
-* **CREATE**: New user records created via `PutCommand` during registration (`/api/register`).
-* **READ**: Products and categories fetched via `ScanCommand` and `GetCommand` (`/api/products`, `/api/products/[id]`).
-* **UPDATE**: Cart items and quantities updated dynamically in user session and synchronized with DynamoDB `PutCommand`/`UpdateCommand`.
-* **DELETE**: Cart and wishlist items removed upon user action.
+Attributes: email (String), name (String), password (String), createdAt (String)
 
----
+4. Shopping Cart Table (Carts)
+Partition Key: userId (String)
 
-## Environment Variables
+Attributes: items (List of Objects: { productId, quantity, price }), updatedAt (String)
 
-Create a `.env.local` file in the root directory and configure the following credentials:
+5. Wishlist Table (Wishlists)
+Partition Key: userId (String)
 
-```env
+Attributes: productIds (List of Strings), updatedAt (String)
+
+Data Operations (CRUD Breakdown)
+CREATE: New user records created via PutCommand during registration (/api/register).
+
+READ: Products and categories fetched via ScanCommand and GetCommand (/api/products, /api/products/[id]).
+
+UPDATE: Cart items and quantities updated dynamically in user session and synchronized with DynamoDB PutCommand/UpdateCommand.
+
+DELETE: Cart and wishlist items removed upon user action.
+
+Environment Variables
+Create a .env.local file in the root directory and configure the following credentials:
+
+Extrait de code
 # AWS DynamoDB Configuration
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your_access_key_id
@@ -148,11 +147,8 @@ DYNAMODB_CATEGORIES_TABLE=Categories
 DYNAMODB_USERS_TABLE=Users
 DYNAMODB_CART_TABLE=Carts
 DYNAMODB_WISHLIST_TABLE=Wishlists
-
----
-
-# Getting Started (Prerequisites)
-
+Getting Started
+Prerequisites
 Node.js (v18.x or later)
 
 npm or yarn
@@ -172,3 +168,5 @@ Run the development server:
 Bash
 npm run dev
 Open http://localhost:3000 in your browser to view the application.
+
+Screenshots
