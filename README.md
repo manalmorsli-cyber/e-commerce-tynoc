@@ -75,8 +75,10 @@ Database Abstraction Layer (lib/dynamodb.ts)
        │
        ▼
 AWS DynamoDB (Cloud Instance or Local Endpoint)
+```
 
 ## Project Structure
+```text
 
 e-commerce-tynoc/
 ├── app/                            # Next.js App Router (Pages & REST API)
@@ -93,8 +95,9 @@ e-commerce-tynoc/
 ├── types/                          # TypeScript type definitions
 ├── .env.local                      # Environment variables
 └── README.md                       # Project documentation
+```
 
-Database Design (AWS DynamoDB)
+## Database Design (AWS DynamoDB)
 The database architecture is designed with NoSQL best practices using AWS DynamoDB:
 
 1. Products Table (Products)
@@ -122,7 +125,7 @@ Partition Key: userId (String)
 
 Attributes: productIds (List of Strings), updatedAt (String)
 
-Data Operations (CRUD Breakdown)
+## Data Operations (CRUD Breakdown)
 CREATE: New user records created via PutCommand during registration (/api/register).
 
 READ: Products and categories fetched via ScanCommand and GetCommand (/api/products, /api/products/[id]).
@@ -131,10 +134,10 @@ UPDATE: Cart items and quantities updated dynamically in user session and synchr
 
 DELETE: Cart and wishlist items removed upon user action.
 
-Environment Variables
+## Environment Variables
 Create a .env.local file in the root directory and configure the following credentials:
-
-# AWS DynamoDB Configuration
+```text
+### AWS DynamoDB Configuration
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your_access_key_id
 AWS_SECRET_ACCESS_KEY=your_secret_access_key
@@ -148,27 +151,33 @@ DYNAMODB_CATEGORIES_TABLE=Categories
 DYNAMODB_USERS_TABLE=Users
 DYNAMODB_CART_TABLE=Carts
 DYNAMODB_WISHLIST_TABLE=Wishlists
-
+```
 
 ## Getting Started
-Prerequisites
+### Prerequisites
 Node.js (v18.x or later)
 
 npm or yarn
 
-Installation
-Clone the repository:
-
+## Installation
+### Clone the repository:
+```text
 git clone [https://github.com/manalmorsli-cyber/e-commerce-tynoc.git](https://github.com/manalmorsli-cyber/e-commerce-tynoc.git)
 cd e-commerce-tynoc
+```
 
-Install project dependencies:
+### Install project dependencies:
+```text
 npm install
+```
 
-Run the development server:
+### Run the development server:
+```text
 npm run dev
+```
 
 Open http://localhost:3000 in your browser to view the application.
+
 ## Screenshots
 
 ### Home Page
