@@ -23,6 +23,7 @@ export default function Navbar({
   showSearch = true,
 }: NavbarProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
   const { cart = [], wishlist = [] } = useCart();
   const { user, logout } = useAuth();
@@ -51,41 +52,37 @@ export default function Navbar({
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200/80 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-0 md:h-20 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-6">
         
+        {/* Header Top Bar / Mobile Header */}
         <div className="w-full md:w-auto flex items-center justify-between">
           <Link href="/" className="shrink-0">
             <Logo variant="light" />
           </Link>
 
-          {/* Mobile Actions */}
+          {/* Mobile Right Actions */}
           <div className="flex items-center gap-2 md:hidden">
-            {isMounted && user ? (
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200">
-                <span>👤 {user.name.split(' ')[0]}</span>
-                <button
-                  onClick={logout}
-                  className="text-[10px] text-red-500 font-semibold ml-1 cursor-pointer"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="text-xs font-bold text-blue-600 border border-blue-600/30 hover:bg-blue-50 px-2.5 py-1.5 rounded-xl transition-colors"
-              >
-                Sign In
-              </Link>
-            )}
-
-            <Link href="/wishlist" className="p-2 text-rose-500 font-bold text-sm">
+            <Link href="/wishlist" className="p-1.5 text-rose-500 font-bold text-sm">
               ♥ <span className="text-xs">({isMounted ? wishlist.length : 0})</span>
             </Link>
+            
             <Link
               href="/cart"
-              className="bg-blue-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer"
+              className="bg-blue-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer"
             >
               🛒 {isMounted ? cartCount : 0}
             </Link>
+
+            {/* Hamburger Toggle Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 text-slate-700 hover:text-blue-600 focus:outline-none rounded-lg border border-slate-200 ml-1"
+              aria-label="Toggle Menu"
+            >
+              {isMenuOpen ? (
+                <span className="text-base font-black leading-none">✕</span>
+              ) : (
+                <span className="text-base font-black leading-none">☰</span>
+              )}
+            </button>
           </div>
         </div>
 
@@ -117,6 +114,60 @@ export default function Navbar({
               <button className="bg-blue-600 hover:bg-blue-700 text-white px-3.5 h-full flex items-center justify-center transition-colors shrink-0 font-bold text-xs">
                 🔍
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Mobile Dropdown Menu (Hamburger Content) */}
+        {isMenuOpen && (
+          <div className="w-full md:hidden flex flex-col gap-3 pt-3 pb-2 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
+            <nav className="flex flex-col gap-2 font-bold text-xs text-slate-700 px-1">
+              <Link
+                href="/"
+                onClick={() => setIsMenuOpen(false)}
+                className="hover:text-blue-600 py-1.5 px-2 rounded-lg hover:bg-slate-50"
+              >
+                🏠 Home
+              </Link>
+              <Link
+                href="/about"
+                onClick={() => setIsMenuOpen(false)}
+                className="hover:text-blue-600 py-1.5 px-2 rounded-lg hover:bg-slate-50"
+              >
+                ℹ️ About Us
+              </Link>
+              <Link
+                href="/contact"
+                onClick={() => setIsMenuOpen(false)}
+                className="hover:text-blue-600 py-1.5 px-2 rounded-lg hover:bg-slate-50"
+              >
+                📞 Contact
+              </Link>
+            </nav>
+
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between px-1">
+              {isMounted && user ? (
+                <div className="flex items-center justify-between w-full bg-slate-100 p-2 rounded-xl border border-slate-200">
+                  <span className="text-xs font-bold text-slate-800">👤 {user.name}</span>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="text-xs text-red-500 font-semibold cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full text-center text-xs font-bold text-blue-600 border border-blue-600/30 hover:bg-blue-50 py-2 rounded-xl transition-colors"
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         )}
