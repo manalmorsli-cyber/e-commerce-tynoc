@@ -75,3 +75,101 @@ Database Abstraction Layer (lib/dynamodb.ts)
        │
        ▼
 AWS DynamoDB (Cloud Instance or Local Endpoint)
+
+---
+
+## Project Structure
+
+e-commerce-tynoc/
+├── app/                            # Next.js App Router (Pages & REST API)
+│   ├── api/                        # Backend REST API endpoints (auth, cart, products, orders...)
+│   ├── (routes)/                   # Application pages (cart, checkout, product/[id], wishlist...)
+│   ├── layout.tsx                  # Root layout & global providers
+│   ├── not-found.tsx               # Custom 404 error page
+│   └── page.tsx                    # Storefront homepage
+├── components/                     # Reusable UI components (Navbar, ProductCard, CartDrawer...)
+├── context/                        # React Context state management (AuthContext, CartContext)
+├── data/                           # Fallback mock datasets
+├── lib/                            # AWS DynamoDB client & server actions
+├── scripts/                        # Database seed scripts
+├── types/                          # TypeScript type definitions
+├── .env.local                      # Environment variables
+└── README.md                       # Project documentation
+
+---
+
+## 🗄️ Database Design (AWS DynamoDB)
+
+The database architecture is designed with NoSQL best practices using AWS DynamoDB:
+
+### 1. Products Table (`Products`)
+* **Partition Key**: `id` (String)
+* **Attributes**: `title` (String), `price` (Number), `description` (String), `category` (String), `image` (String), `images` (List), `badge` (String), `inStock` (Boolean)
+
+### 2. Categories Table (`Categories`)
+* **Partition Key**: `id` (String)
+* **Attributes**: `name` (String), `slug` (String), `icon` (String)
+
+### 3. Users Table (`Users`)
+* **Partition Key**: `id` (String)
+* **Attributes**: `email` (String), `name` (String), `password` (String), `createdAt` (String)
+
+### 4. Shopping Cart Table (`Carts`)
+* **Partition Key**: `userId` (String)
+* **Attributes**: `items` (List of Objects: `{ productId, quantity, price }`), `updatedAt` (String)
+
+### 5. Wishlist Table (`Wishlists`)
+* **Partition Key**: `userId` (String)
+* **Attributes**: `productIds` (List of Strings), `updatedAt` (String)
+
+### Data Operations (CRUD Breakdown)
+* **CREATE**: New user records created via `PutCommand` during registration (`/api/register`).
+* **READ**: Products and categories fetched via `ScanCommand` and `GetCommand` (`/api/products`, `/api/products/[id]`).
+* **UPDATE**: Cart items and quantities updated dynamically in user session and synchronized with DynamoDB `PutCommand`/`UpdateCommand`.
+* **DELETE**: Cart and wishlist items removed upon user action.
+
+---
+
+## Environment Variables
+
+Create a `.env.local` file in the root directory and configure the following credentials:
+
+```env
+# AWS DynamoDB Configuration
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_access_key_id
+AWS_SECRET_ACCESS_KEY=your_secret_access_key
+
+# Optional: Local DynamoDB Endpoint (For offline development)
+DYNAMODB_ENDPOINT=[http://127.0.0.1:8000](http://127.0.0.1:8000)
+
+# Table Names
+DYNAMODB_PRODUCTS_TABLE=Products
+DYNAMODB_CATEGORIES_TABLE=Categories
+DYNAMODB_USERS_TABLE=Users
+DYNAMODB_CART_TABLE=Carts
+DYNAMODB_WISHLIST_TABLE=Wishlists
+
+---
+
+# Getting Started (Prerequisites)
+
+Node.js (v18.x or later)
+
+npm or yarn
+
+Installation
+Clone the repository:
+
+Bash
+git clone [https://github.com/manalmorsli-cyber/e-commerce-tynoc.git](https://github.com/manalmorsli-cyber/e-commerce-tynoc.git)
+cd e-commerce-tynoc
+Install project dependencies:
+
+Bash
+npm install
+Run the development server:
+
+Bash
+npm run dev
+Open http://localhost:3000 in your browser to view the application.
