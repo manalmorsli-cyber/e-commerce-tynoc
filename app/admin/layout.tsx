@@ -72,14 +72,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* HEADER MOBILE */}
       <header className="md:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
         <div className="flex items-center space-x-3">
-          {/* LOGO ICON.SVG MOBILE */}
           <div className="w-9 h-9 relative flex items-center justify-center">
             <img src="/icon.svg" alt="Admin Logo" className="w-full h-full object-contain" />
           </div>
           <span className="font-bold text-lg text-white">Admin Panel</span>
         </div>
 
-        {/* BOUTON HAMBURGER */}
+        {/* Hamb menu*/}
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition focus:outline-none"
@@ -97,7 +96,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
       </header>
 
-      {/* OVERLAY SOMBRE MOBILE */}
+      {/* MOBILE */}
       {isMobileOpen && (
         <div
           onClick={() => setIsMobileOpen(false)}
@@ -160,7 +159,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* CONTENU PRINCIPAL */}
+      {/* principle content */}
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
         {children}
       </main>

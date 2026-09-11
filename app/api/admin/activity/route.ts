@@ -15,27 +15,27 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 export async function GET() {
   try {
-    // 1. Récupération des paniers
+    // cart
     const cartsRes = await docClient.send(
       new ScanCommand({ TableName: process.env.DYNAMODB_CARTS_TABLE || "Carts" })
     );
     const carts = cartsRes.Items || [];
 
-    // 2. Récupération des utilisateurs
+    // users
     const usersRes = await docClient.send(
       new ScanCommand({ TableName: process.env.DYNAMODB_USERS_TABLE || "Users" })
     );
     const users = usersRes.Items || [];
     const userMap = new Map(users.map((u) => [u.id || u.userId, u]));
 
-    // 3. Récupération des produits
+    //products
     const productsRes = await docClient.send(
       new ScanCommand({ TableName: process.env.DYNAMODB_PRODUCTS_TABLE || "Products" })
     );
     const products = productsRes.Items || [];
     const productMap = new Map(products.map((p) => [p.id || p.productId, p]));
 
-    // 4. Enrichissement des paniers avec les infos User et Product
+    // user and prduct info : cart
     const enrichedCarts = carts.map((cart) => {
       const user = userMap.get(cart.userId) || userMap.get(cart.id);
       const rawItems = cart.items || cart.cartItems || cart.products || [];

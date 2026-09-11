@@ -174,7 +174,7 @@ export default function AdminProductsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Product Management</h1>
-          <p className="text-gray-500 text-sm">Add, update, or remove products from DynamoDB</p>
+          <p className="text-gray-500 text-sm">Add, update, or remove products</p>
         </div>
         <button
           onClick={() => handleOpenForm()}
@@ -230,14 +230,14 @@ export default function AdminProductsPage() {
             className="w-full p-2 border rounded dark:bg-gray-800 border-gray-300 dark:border-gray-700"
           />
 
-          {/* Section Gestion des Images */}
+          {/* image management */}
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
             <label className="block text-sm font-bold text-gray-700 dark:text-gray-300">
               Product Images ({imagesList.length})
             </label>
 
             <div className="flex flex-wrap gap-3 items-center">
-              {/* Importation depuis l'ordinateur */}
+              {/* Add from desk*/}
               <label className="cursor-pointer px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition flex items-center gap-2">
                 📂 Choisir depuis le PC / Bureau
                 <input
@@ -249,7 +249,7 @@ export default function AdminProductsPage() {
                 />
               </label>
 
-              {/* Ajout par URL */}
+              {/* add by URL */}
               <div className="flex-1 flex gap-2 min-w-[280px]">
                 <input
                   type="url"
@@ -268,7 +268,6 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
-            {/* Aperçu des miniatures d'images */}
             {imagesList.length > 0 && (
               <div className="flex flex-wrap gap-3 pt-2">
                 {imagesList.map((img, idx) => (

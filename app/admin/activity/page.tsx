@@ -70,7 +70,6 @@ export default function AdminActivityPage() {
 
   const currentData = activeTab === "carts" ? carts : wishlists;
 
-  // Calcul du total d'une activité
   const calculateTotal = (items?: ProductItem[]) => {
     if (!items) return 0;
     return items.reduce((acc, item) => {
@@ -168,7 +167,7 @@ export default function AdminActivityPage() {
         </div>
       </div>
 
-      {/* MODALE DETAILS DU PANIER / WISHLIST */}
+      {/* CART / WISHLIST */}
       {selectedActivity && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
@@ -182,7 +181,7 @@ export default function AdminActivityPage() {
             </div>
 
             <div className="space-y-4">
-              {/* Information client */}
+              {/* clients */}
               <div className="bg-slate-800/50 p-3 rounded-xl border border-slate-700/50 text-xs">
                 <p className="text-slate-400 font-semibold uppercase text-[10px]">Client</p>
                 <p className="text-white font-bold text-sm">
@@ -196,7 +195,7 @@ export default function AdminActivityPage() {
                 </p>
               </div>
 
-              {/* Liste des produits */}
+              {/*products */}
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                 {selectedActivity.items && selectedActivity.items.length > 0 ? (
                   selectedActivity.items.map((prod, idx) => {
@@ -242,7 +241,7 @@ export default function AdminActivityPage() {
                 )}
               </div>
 
-              {/* Total global */}
+
               {selectedActivity.items && selectedActivity.items.length > 0 && (
                 <div className="flex justify-between items-center pt-2 border-t border-slate-800 text-sm font-bold">
                   <span className="text-slate-400">Total Estimation:</span>

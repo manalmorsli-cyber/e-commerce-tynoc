@@ -119,7 +119,7 @@ export default function AdminCategoriesPage() {
         <p className="text-slate-400 text-sm">Organize product categories</p>
       </div>
 
-      {/* Formulaire Ajout */}
+      {/* add form*/}
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 max-w-xl">
         <h2 className="text-lg font-bold text-white mb-4">Add Category</h2>
         <form onSubmit={handleAddCategory} className="space-y-4">
@@ -189,7 +189,7 @@ export default function AdminCategoriesPage() {
         </table>
       </div>
 
-      {/* Modale Édition */}
+      {/* Modale Edit */}
       {editingCategory && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <form onSubmit={handleUpdateCategory} className="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 space-y-4">
