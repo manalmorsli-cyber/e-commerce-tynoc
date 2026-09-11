@@ -315,6 +315,7 @@ export default function AdminProductsPage() {
       )}
 
       <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-x-auto">
+        <div className="w-full overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 uppercase text-xs">
             <tr>
@@ -362,6 +363,7 @@ export default function AdminProductsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       <ConfirmModal

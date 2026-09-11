@@ -114,6 +114,7 @@ export default function AdminActivityPage() {
       </div>
 
       <div className="bg-slate-900/80 border border-slate-800 rounded-2xl overflow-x-auto shadow-xl">
+      <div className="w-full overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead className="bg-slate-800/60 text-slate-400 font-bold uppercase tracking-wider">
             <tr>
@@ -164,6 +165,7 @@ export default function AdminActivityPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* MODALE DETAILS DU PANIER / WISHLIST */}
