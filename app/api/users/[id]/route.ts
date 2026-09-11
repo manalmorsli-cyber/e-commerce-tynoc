@@ -12,6 +12,7 @@ const client = new DynamoDBClient({
 });
 
 const docClient = DynamoDBDocumentClient.from(client);
+const TABLE_NAME = process.env.DYNAMODB_USERS_TABLE || "Users";
 
 async function getIdParam(params: Promise<{ id: string }> | { id: string }) {
   const resolvedParams = await Promise.resolve(params);
@@ -25,17 +26,14 @@ export async function GET(
   try {
     const id = await getIdParam(params);
     const res = await docClient.send(
-      new GetCommand({
-        TableName: process.env.DYNAMODB_PRODUCTS_TABLE || "Products",
-        Key: { id },
-      })
+      new GetCommand({ TableName: TABLE_NAME, Key: { id } })
     );
     if (!res.Item) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
     return NextResponse.json(res.Item);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Failed to fetch product" }, { status: 500 });
+    return NextResponse.json({ error: error.message || "Failed to fetch user" }, { status: 500 });
   }
 }
 
@@ -46,35 +44,37 @@ export async function PUT(
   try {
     const id = await getIdParam(params);
     const body = await request.json();
-    const { title, price, category, inStock, description, image, images } = body;
+    const { name, email, role, status } = body;
 
-    const imageList = Array.isArray(images) && images.length > 0
-      ? images
-      : (image ? [image] : []);
+    if (!name || !email) {
+      return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
+    }
 
-    const updatedProduct = {
+    const existing = await docClient.send(
+      new GetCommand({ TableName: TABLE_NAME, Key: { id } })
+    );
+
+    const updatedUser = {
+      ...(existing.Item || {}),
       id,
-      title,
-      price: Number(price),
-      category: category || "General",
-      inStock: Boolean(inStock),
-      description: description || "",
-      image: imageList[0] || image || "",
-      images: imageList, // <--- Sauvegarde du tableau d'images
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      role: role || "User",
+      status: status || "Active",
       updatedAt: new Date().toISOString(),
     };
 
     await docClient.send(
       new PutCommand({
-        TableName: process.env.DYNAMODB_PRODUCTS_TABLE || "Products",
-        Item: updatedProduct,
+        TableName: TABLE_NAME,
+        Item: updatedUser,
       })
     );
 
-    return NextResponse.json(updatedProduct);
+    return NextResponse.json(updatedUser);
   } catch (error: any) {
-    console.error("PUT Product Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to update product" }, { status: 500 });
+    console.error("PUT User Error:", error);
+    return NextResponse.json({ error: error.message || "Failed to update user" }, { status: 500 });
   }
 }
 
@@ -86,13 +86,13 @@ export async function DELETE(
     const id = await getIdParam(params);
     await docClient.send(
       new DeleteCommand({
-        TableName: process.env.DYNAMODB_PRODUCTS_TABLE || "Products",
+        TableName: TABLE_NAME,
         Key: { id },
       })
     );
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id });
   } catch (error: any) {
-    console.error("DELETE Product Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to delete product" }, { status: 500 });
+    console.error("DELETE User Error:", error);
+    return NextResponse.json({ error: error.message || "Failed to delete user" }, { status: 500 });
   }
 }

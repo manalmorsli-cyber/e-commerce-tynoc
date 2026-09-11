@@ -32,7 +32,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // La fonction login prend maintenant l'objet User complet
   const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem('tynoc_user', JSON.stringify(userData));

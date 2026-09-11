@@ -8,6 +8,7 @@ export interface Product {
   images?: string[];
   badge?: string;
   stock?: number;
+  inStock?: boolean;
   rating?: number | { rate: number; count: number };
   createdAt?: string;
   isFeatured?: boolean;

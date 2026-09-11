@@ -30,13 +30,11 @@ export default function ProductDetailPage() {
           const data: Product = await res.json();
           setProduct(data);
         } else {
-          // Fallback to local mock products if API responds with an error
           const fallback = mockProducts.find((item) => String(item.id) === String(id));
           setProduct(fallback || null);
         }
       } catch (error) {
         console.error('API fetch failed, reading from mock products:', error);
-        // Fallback to local mock products if offline or API route fails
         const fallback = mockProducts.find((item) => String(item.id) === String(id));
         setProduct(fallback || null);
       } finally {
@@ -69,6 +67,11 @@ export default function ProductDetailPage() {
     notFound();
   }
 
+  // Déterminer dynamiquement si le produit est en stock
+  const isInStock =
+    product.inStock ??
+    (typeof product.stock === 'number' ? product.stock > 0 : Boolean(product.stock ?? true));
+
   const productImages: string[] =
     Array.isArray(product.images) && product.images.length > 0
       ? product.images
@@ -77,6 +80,7 @@ export default function ProductDetailPage() {
   const currentImage = productImages[selectedImageIndex] || product.image;
 
   const handleAddToCart = () => {
+    if (!isInStock) return;
     for (let i = 0; i < quantity; i++) {
       addToCart(product);
     }
@@ -151,10 +155,19 @@ export default function ProductDetailPage() {
                   <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
                     {product.category || 'General'}
                   </span>
-                  <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-md">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    In Stock (Ready to ship)
-                  </span>
+                  
+                  {/* Badge Dynamique Stock */}
+                  {isInStock ? (
+                    <span className="text-xs font-semibold text-emerald-600 flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-md">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      In Stock (Ready to ship)
+                    </span>
+                  ) : (
+                    <span className="text-xs font-semibold text-rose-600 flex items-center gap-1.5 bg-rose-50 px-2.5 py-1 rounded-md">
+                      <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                      Out of Stock
+                    </span>
+                  )}
                 </div>
 
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-snug">
@@ -180,7 +193,8 @@ export default function ProductDetailPage() {
                   <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50 overflow-hidden h-11">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-10 h-full flex items-center justify-center font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+                      disabled={!isInStock}
+                      className="w-10 h-full flex items-center justify-center font-bold text-slate-600 hover:bg-slate-200 transition-colors disabled:opacity-50"
                     >
                       -
                     </button>
@@ -189,20 +203,28 @@ export default function ProductDetailPage() {
                     </span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="w-10 h-full flex items-center justify-center font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+                      disabled={!isInStock}
+                      className="w-10 h-full flex items-center justify-center font-bold text-slate-600 hover:bg-slate-200 transition-colors disabled:opacity-50"
                     >
                       +
                     </button>
                   </div>
 
+                  {/* Bouton Ajouter au Panier Dynamique */}
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold h-11 px-5 rounded-xl transition-all shadow-lg text-xs flex items-center justify-center gap-2 cursor-pointer"
+                    disabled={!isInStock}
+                    className={`flex-1 font-bold h-11 px-5 rounded-xl transition-all text-xs flex items-center justify-center gap-2 ${
+                      isInStock
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg cursor-pointer'
+                        : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
                   >
                     <span>🛒</span>
                     <span>
-                      Add to Cart ($
-                      {(Number(product.price) * quantity).toFixed(2)})
+                      {isInStock
+                        ? `Add to Cart ($${(Number(product.price) * quantity).toFixed(2)})`
+                        : 'Out of Stock'}
                     </span>
                   </button>
 
@@ -269,7 +291,9 @@ export default function ProductDetailPage() {
               </div>
               <div className="flex justify-between py-2 px-3 bg-slate-50 rounded-lg">
                 <span className="text-slate-500">Availability</span>
-                <span className="font-bold text-emerald-600">In Stock</span>
+                <span className={`font-bold ${isInStock ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {isInStock ? 'In Stock' : 'Out of Stock'}
+                </span>
               </div>
               <div className="flex justify-between py-2 px-3 bg-slate-50 rounded-lg">
                 <span className="text-slate-500">Condition</span>
