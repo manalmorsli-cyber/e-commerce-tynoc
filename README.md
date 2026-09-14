@@ -38,7 +38,7 @@ Users can browse products, search and filter by category, manage a shopping cart
 
 ### Admin Backoffice & Data Management (`/admin`)
 * **Overview Dashboard**: Real-time activity and metrics overview fetched from AWS DynamoDB (`Total Users`, `Total Products`, `Total Categories`, `Active Carts`, `Saved Wishlists`).
-* **Reusable Admin Components**: Modular architecture utilizing custom UI components like `StatCard.tsx` and administrative navigation layouts.
+* **Admin Components**: Modular architecture utilizing custom UI components like `StatCard.tsx` and administrative navigation layouts.
 * **Product Management (CRUD)**: Full interface to add new products, update existing details, modify stock status, and delete items.
 * **Category Management (CRUD)**: Create, edit, and delete store categories and URL slugs.
 * **User Management**: Inspect registered users, manage user roles, and handle account administration.
